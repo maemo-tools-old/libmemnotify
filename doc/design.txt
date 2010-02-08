@@ -1,0 +1,70 @@
+Design notes for libmemnotifyqt
+===============================
+
+The libmemnotifyqt implements a notification for memory usage events according to levels specified in control file.
+
+Default name space is memnotify (later could be memnotify_v2 etc)
+
+memnotify::QMemoryNotification -- Main proxy class to control subscription and propagate events
+  1. Memory events notifications are not sorted by memory usage, they delivery is based on notifications from low level APIs
+  2. If memory level is set to ON you will get notification during subscription (see listen or queryEvents)
+
+  static create("path specs")
+
+  bool listen()  -- starts to listen in automatic mode using aio, required subscription
+  queryEvents(int* fd, unsigned size); -- queries events descriptors to make poll outside, required subscription
+  processEvents(const int* fd, unsigned counter);  -- handles events detected in extenal poll loop. required subscription
+
+  enable()  -- enable tracking, called automatical when listen() or queryEvents() called
+  disable() -- disable tracking, called before destruction of object or if you need re-subscribe
+
+  # subscription (any or both)
+  signal threshold(const char* name, const bool state);
+
+  typedef void (*THRESHOLD_CALLBACK)(const char* name, const bool state);
+  bool addListener(THRESHOLD_CALLBACK cb);
+  bool delListener(THRESHOLD_CALLBACK cb);
+
+Todo:
+  1. to create actual listeners we can track
+  protected:
+    virtual void connectNotify(const char* signal);
+    virtual void disconnectNotify(const char* signal);
+
+memnotify::QCachedFile -- file with cached contents, knows how to reload contents in cheapest way - rewind and read
+memnotify::QWatcher    -- object which listen for updates, could be
+  QEventfdWatcher -- uses eventfd for tracking
+  QInotifyWatcher -- uses inotify for tracking
+
+memnotify::QWatcherBuilder -- makes a controller based on description "type="
+memnotify::QCgroupsWatcherBuilder -- makes a watcher for cgroups controller
+memnotify::QDebugWatcherBuilder -- makes a watcher for debug controller
+
+memnotify::QPlatform -- platform parameters as
+- MEMNOTIFY env variable with settings
+- total, free and used memory
+- TBD
+
+Control file structure
+----------------------
+The control file is an ascii ini-style file which contains levels description for specified controllers.
+Control file could be located:
+- /etc/memnotify folder as a system-wide specification, accessible as "platform.mn"
+- $HOME folder - as user-only specification, accessible as ".quake3.mn"
+- some path which you like, e.g. "/etc/defaults/quake.mn"
+
+Overall control file structure is the following:
+  [Memory Signal Name 1]
+  type=type_of_controller
+  sensor=file path to sensor
+  limit=value or path to limit file
+  free=value k|m|%
+  used=value k|m|%
+
+Details for each parameter:
+type=cgroups_control
+
+  control=path_to_control file
+
+type=debug
+  seems nothing
