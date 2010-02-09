@@ -2,10 +2,89 @@ Design notes for libmemnotifyqt
 ===============================
 
 The libmemnotifyqt implements a notification for memory usage events according to levels specified in control file.
+Default name space is MEMNOTIFY_NAMESPACE (later could be MEMNOTIFY_NAMESPACE_V2 etc) which is declared using
+BEGIN_MEMNOTIFY_NAMESPACE and END_MEMOTIFY_NAMESPACE.
 
-Default name space is memnotify (later could be memnotify_v2 etc)
+Basic usage
+-----------
+only 3 important steps should be done
+1. initialization
+2. subscription
+3. reaction
 
-memnotify::QMemoryNotification -- Main proxy class to control subscription and propagate events
+Initialization will be handled according to control files (see below), by default /etc/memnotify/default.nm will be used
+  [System Memory Low]
+  type=cgroups_control
+  control=/syspart/cgroup.event_control
+  limit=/syspart/memory.memsw.memory_limit_in_bytes
+  sensor=/syspart/memory.memsw.memory_usage_in_bytes
+  used=90%
+
+To construct the object you can use explicit or implicit constructor call
+  notify = new MemoryNotification();
+or
+  notify = MemoryNotification::create();
+
+The subscription could be done for callback or signal. Callback will be called before signal and might be called from AIO
+thread:
+  static void myListener(const char* name, const bool state)
+  {
+    printf ("memory signal %s delivered in state %d\n", name, state);
+    if (state && 0 == strcmp(name, "System Memory Low"))
+    {
+      FlushMyMemory();
+    }
+  }
+  notify.addListener(myListener);
+
+Then you may initiate listening events
+  if ( !notify.listen() )     <-- here you may get notifications for all thesholds which set to true.
+  {
+    oops();
+  }
+
+At the end you may require to close and destroy object
+  delete notify;
+
+
+Control files structure
+-----------------------
+The control file is an ascii ini-style file which contains levels description for specified controllers.
+Control file could be located:
+- /etc/memnotify folder as a system-wide specification, accessible as "platform.mn"
+- $HOME folder - as user-only specification, accessible as "./quake3/memory.mn"
+- some path which you like, e.g. "/etc/defaults/quake.mn"
+
+You can point such files in constructor path, thresholds with the same names will be updated according to files list
+  notify = new MemoryNotification("default:./quake3/memory.mn");
+
+Overall control file structure is the following:
+  [Memory Signal Name]
+  type=type_of_controller
+  sensor=file path to sensor
+  limit=value or path to limit file
+  free=value k|m|%
+  used=value k|m|%
+
+Details for each parameter:
+  type    - now cgroups_control and debug can be used
+  sensor - path to file which should be used to tracking current memory usage
+  limit  - could be a value or path to file which contains limiting value, required only for "free" kind thresholds
+  free   - amount of free memory (limit vs. sensor) in kilobytes, megabytes or percents to be raised
+  used   - amount of used memory (in sensor) in kilobytes, megabytes or percents to be raised, conflicts with "free"
+
+type=cgroups_control  --- this controller will use cgroups infrastructure to check memory level (RAM or virtual)
+  control=path_to_control file usually visible as cgroup.event_control in cgroup. To point the cgroup for current process
+    prefix "cgroup:" could be used i.e. "control = cgroup:/cgroup.event_control" is a valid setting.
+
+type=debug -- this controller will use pointed sensor file with inotify access to control memory level
+  nothing additional, you can "echo currentMem > sensor" to see updates in application
+
+
+Classes details
+---------------
+
+memnotify::MemoryNotification -- Main proxy class to control subscription and propagate events
   1. Memory events notifications are not sorted by memory usage, they delivery is based on notifications from low level APIs
   2. If memory level is set to ON you will get notification during subscription (see listen or queryEvents)
 
@@ -17,13 +96,14 @@ memnotify::QMemoryNotification -- Main proxy class to control subscription and p
 
   enable()  -- enable tracking, called automatical when listen() or queryEvents() called
   disable() -- disable tracking, called before destruction of object or if you need re-subscribe
+  query(theshold)
 
   # subscription (any or both)
-  signal threshold(const char* name, const bool state);
+  signal notified(const char* name, const bool state);
 
-  typedef void (*THRESHOLD_CALLBACK)(const char* name, const bool state);
-  bool addListener(THRESHOLD_CALLBACK cb);
-  bool delListener(THRESHOLD_CALLBACK cb);
+  typedef void (*MEMNOTIFY_LISTENER)(const char* name, const bool state);
+  bool addListener(MEMNOTIFY_LISTENER listener);
+  bool delListener(MEMNOTIFY_LISTENER listener);
 
 Todo:
   1. to create actual listeners we can track
@@ -31,40 +111,18 @@ Todo:
     virtual void connectNotify(const char* signal);
     virtual void disconnectNotify(const char* signal);
 
-memnotify::QCachedFile -- file with cached contents, knows how to reload contents in cheapest way - rewind and read
-memnotify::QWatcher    -- object which listen for updates, could be
-  QEventfdWatcher -- uses eventfd for tracking
-  QInotifyWatcher -- uses inotify for tracking
+memnotify::CachedFile -- file with cached contents, knows how to reload contents in cheapest way - rewind and read
+memnotify::Watcher    -- object which listen for updates, could be
+  EventfdWatcher -- uses eventfd for tracking
+  InotifyWatcher -- uses inotify for tracking
 
-memnotify::QWatcherBuilder -- makes a controller based on description "type="
-memnotify::QCgroupsWatcherBuilder -- makes a watcher for cgroups controller
-memnotify::QDebugWatcherBuilder -- makes a watcher for debug controller
+memnotify::WatcherBuilder -- makes a controller based on description "type="
+memnotify::CgroupsWatcherBuilder -- makes a watcher for cgroups controller
+memnotify::DebugWatcherBuilder -- makes a watcher for debug controller
 
-memnotify::QPlatform -- platform parameters as
+memnotify::Platform -- platform parameters as
 - MEMNOTIFY env variable with settings
 - total, free and used memory
+- location of /syspart
 - TBD
 
-Control file structure
-----------------------
-The control file is an ascii ini-style file which contains levels description for specified controllers.
-Control file could be located:
-- /etc/memnotify folder as a system-wide specification, accessible as "platform.mn"
-- $HOME folder - as user-only specification, accessible as ".quake3.mn"
-- some path which you like, e.g. "/etc/defaults/quake.mn"
-
-Overall control file structure is the following:
-  [Memory Signal Name 1]
-  type=type_of_controller
-  sensor=file path to sensor
-  limit=value or path to limit file
-  free=value k|m|%
-  used=value k|m|%
-
-Details for each parameter:
-type=cgroups_control
-
-  control=path_to_control file
-
-type=debug
-  seems nothing
