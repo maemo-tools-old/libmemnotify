@@ -122,14 +122,15 @@ MEMNOTIFY::CachedFile -- file with cached contents, knows how to reload contents
   value()  -- file value
   isValid()-- validate current object (e.g. file exists)
   dump()   -- dump the contents for debugging
-  hash()
-  path()
+  hash()   -- has value to quick comparison
+  path()   -- path to compare
+  handler  -- file descriptor to compare
 
 file Watcher
 MEMNOTIFY::Watcher    -- object which listen for updates, could be
   enable
   disable
-  watcher
+  handler
 
 file EventfdWatcher
   EventfdWatcher -- uses eventfd for tracking
