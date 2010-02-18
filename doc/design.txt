@@ -2,7 +2,7 @@ Design notes for libmemnotifyqt
 ===============================
 
 The libmemnotifyqt implements a notification for memory usage events according to levels specified in control file.
-Default name space is MEMNOTIFY_NAMESPACE (later could be MEMNOTIFY_NAMESPACE_V2 etc) which is declared using
+Default name space is MEMNOTIFY (defined as MemNotifyNameSpace and later could be MemNotifyNameSpace2 etc) which is declared using
 BEGIN_MEMNOTIFY_NAMESPACE and END_MEMOTIFY_NAMESPACE.
 
 Basic usage
@@ -84,43 +84,65 @@ type=debug -- this controller will use pointed sensor file with inotify access t
 Classes details
 ---------------
 
-memnotify::MemoryNotification -- Main proxy class to control subscription and propagate events
+file MemoryNotification
+MEMNOTIFY::MemoryNotification -- Main proxy class to control subscription and propagate events
   1. Memory events notifications are not sorted by memory usage, they delivery is based on notifications from low level APIs
   2. If memory level is set to ON you will get notification during subscription (see listen or queryEvents)
 
   static create("path specs")
 
-  bool listen()  -- starts to listen in automatic mode using aio, required subscription
-  queryEvents(int* fd, unsigned size); -- queries events descriptors to make poll outside, required subscription
-  processEvents(const int* fd, unsigned counter);  -- handles events detected in extenal poll loop. required subscription
+  bool pollWatchers()  -- starts to listen in automatic mode using aio, required subscription
+  queryWatchers(int* fd, unsigned size); -- queries events descriptors to make poll outside, required subscription
+  handleWatchers(const int* fd, unsigned counter);  -- handles events detected in extenal poll loop. required subscription
 
-  enable()  -- enable tracking, called automatical when listen() or queryEvents() called
+  enable()  -- enabsle tracking, called automatical when listen() or queryEvents() called
   disable() -- disable tracking, called before destruction of object or if you need re-subscribe
   query(theshold)
 
   # subscription (any or both)
   signal notified(const char* name, const bool state);
 
-  typedef void (*MEMNOTIFY_LISTENER)(const char* name, const bool state);
-  bool addListener(MEMNOTIFY_LISTENER listener);
-  bool delListener(MEMNOTIFY_LISTENER listener);
+  typedef void (*MEMNOTIFY_OBSERVER)(const char* name, const bool state);
+  bool addObserver(MEMNOTIFY_OBSERVER observer);
+  bool delObserver(MEMNOTIFY_OBSERVER observer);
+
+  isValid()-- validate current object (e.g. file exists)
+  dump()   -- dump the contents for debugging
 
 Todo:
-  1. to create actual listeners we can track
+  1. to create actual observers we can track
   protected:
     virtual void connectNotify(const char* signal);
     virtual void disconnectNotify(const char* signal);
 
-memnotify::CachedFile -- file with cached contents, knows how to reload contents in cheapest way - rewind and read
-memnotify::Watcher    -- object which listen for updates, could be
+file CachedFile
+MEMNOTIFY::CachedFile -- file with cached contents, knows how to reload contents in cheapest way - rewind and read
+  reload() -- reload file according to specified limit
+  text()   -- file contents as a text (const char*)
+  value()  -- file value
+  isValid()-- validate current object (e.g. file exists)
+  dump()   -- dump the contents for debugging
+  hash()
+  path()
+
+file Watcher
+MEMNOTIFY::Watcher    -- object which listen for updates, could be
+  enable
+  disable
+  watcher
+
+file EventfdWatcher
   EventfdWatcher -- uses eventfd for tracking
+
+file InitifyWatcher
   InotifyWatcher -- uses inotify for tracking
 
-memnotify::WatcherBuilder -- makes a controller based on description "type="
-memnotify::CgroupsWatcherBuilder -- makes a watcher for cgroups controller
-memnotify::DebugWatcherBuilder -- makes a watcher for debug controller
+file WatcherBuilder
+MEMNOTIFY::WatcherBuilder -- makes a controller based on description "type=" and QSettins
+MEMNOTIFY::CgroupsWatcherBuilder -- makes a watcher for cgroups controller
+MEMNOTIFY::DebugWatcherBuilder -- makes a watcher for debug controller
 
-memnotify::Platform -- platform parameters as
+MEMNOTIFY::Platform -- platform parameters and settings
 - MEMNOTIFY env variable with settings
 - total, free and used memory
 - location of /syspart
