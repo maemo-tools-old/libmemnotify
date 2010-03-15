@@ -1,0 +1,35 @@
+Source: libmemnotifyqt
+Section: libs
+Priority: optional
+Maintainer: Leonid Moiseichuk <leonid.moiseichuk@nokia.com>
+Build-Depends: debhelper (>= 5), libqt4-dev (>= 4.5), libqt4-test (>= 4.5), doxygen, graphviz
+Standards-Version: 3.7.3
+Description: Memory Notification library Qt-style.
+
+Package: libmemnotifyqt-dev
+Section: libdevel
+Architecture: any
+Depends: libmemnotifyqt (= ${binary:Version}), libqt4-dev (>= 4.5)
+Recommends: libmemnotifyqt-doc
+Description: Memory Notification library Qt-style.
+ Development package for Memory Notification.
+
+Package: libmemnotifyqt-dbg
+Section: libdevel
+Priority: extra
+Architecture: any
+Depends: libmemnotifyqt (= ${binary:Version})
+Description: Memory Notification library Qt-style. Debugging package.
+
+Package: libmemnotifyqt-doc
+Section: doc
+Architecture: any
+Recommends: libmemnotifyqt, libmemnotifyqt-dev
+Description: Memory Notification library Qt-style. Documentation for developers.
+
+Package: libmemnotifyqt-test
+Section: libdevel
+Priority: extra
+Architecture: any
+Depends: libmemnotifyqt (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Memory Notification library Qt-style. Testing files.

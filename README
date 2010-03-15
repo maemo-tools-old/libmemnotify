@@ -1,0 +1,17 @@
+Welcome to the wonderful world of MemNotify!
+
+Frequently asked questions (FAQ):
+
+1. What is memnotify?
+
+MemNotify is a library to manage memory usage signals, mostly from cgroups containers.
+For more detailed description and examples see the "Design Notes" in file doc/design.txt
+
+2. What for that is?
+
+To control how much memory used in embedded system and react properly e.g. by not
+handling every malloc() to be successful.
+
+3. Do you have something Qt-less?
+
+Yes, see libmemnotify.
