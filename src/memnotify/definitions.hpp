@@ -86,13 +86,42 @@ BEGIN_MEMNOTIFY_NAMESPACE
 /*!
   \macro MEMNOTIFY_DUMP
   \relates <memnotify/definitions.hpp>
-  This macro marks a symbol as non-exportable and non-visible outside.
+  This macro controls dump function implemenatation.
   \sa QT_NO_DEBUG
 */
-#ifdef QT_NO_DEBUG
-#define MEMNOTIFY_DUMP      0
-#else
-#define MEMNOTIFY_DUMP      1
+#ifndef MEMNOTIFY_DUMP
+  #ifdef QT_NO_DEBUG
+    #define MEMNOTIFY_DUMP      0
+  #else
+    #define MEMNOTIFY_DUMP      1
+  #endif
+#endif
+
+/*!
+  \macro MEMNOTIFY_ENV_NAME
+  \relates <memnotify/definitions.hpp>
+  Name of environment variable which could be used to control settings in runtime.
+*/
+#ifndef MEMNOTIFY_ENV_NAME
+#define MEMNOTIFY_ENV_NAME    "MEMNOTIFY"
+#endif
+
+/*!
+  \macro MEMNOTIFY_CONF_PATH
+  \relates <memnotify/definitions.hpp>
+  Path of default location for configuration files.
+*/
+#ifndef MEMNOTIFY_CONF_PATH
+#define MEMNOTIFY_CONF_PATH   "/etc/memnotify"
+#endif
+
+/*!
+  \macro MEMNOTIFY_CGROUPS_MOUNT_POINT
+  \relates <memnotify/definitions.hpp>
+  Path of default mount point for cgroups (/syspart).
+*/
+#ifndef MEMNOTIFY_CGROUPS_MOUNT_POINT
+#define MEMNOTIFY_CGROUPS_MOUNT_POINT   "/syspart"
 #endif
 
 /* ------------------------------------------------------------------------- *
