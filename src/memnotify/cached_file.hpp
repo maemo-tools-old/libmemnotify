@@ -52,7 +52,7 @@ class MEMNOTIFY_EXPORT CachedFile
   public:
 
     /* open pointed file to reloads and specified refresh interval in milliseconds */
-    CachedFile(const char* sPath, const unsigned msUpdateInteval = 0);
+    CachedFile(const char* sPath, const unsigned msUpdateInteval = 1000);
     ~CachedFile();
 
     /* load or reload file contents, returns true of success */
@@ -63,10 +63,10 @@ class MEMNOTIFY_EXPORT CachedFile
 
     /* file attributes: path and handler */
     const char* path() const;
-    int hander() const;
+    int handler() const;
 
     const char* text() const;
-    int value() const;
+    long       value() const;
 
     /* dumping internal information to stdout */
     void dump() const;
@@ -120,7 +120,7 @@ inline bool CachedFile :: load()
 /* validate file status and contents */
 inline bool CachedFile :: valid() const
 {
-  return (myPath && myHandler >= 0 && myText);
+  return (myPath && myHandler >= 0);
 }
 
 /* file attributes: path and handler */
@@ -129,7 +129,7 @@ inline const char* CachedFile :: path() const
   return myPath;
 }
 
-inline int CachedFile :: hander() const
+inline int CachedFile :: handler() const
 {
   return myHandler;
 }
@@ -139,9 +139,9 @@ inline const char* CachedFile :: text() const
   return myText;
 }
 
-inline int CachedFile :: value() const
+inline long CachedFile :: value() const
 {
-  return (myText && *myText ? atoi(myText) : 0);
+  return (myText && *myText ? atol(myText) : 0);
 }
 
 

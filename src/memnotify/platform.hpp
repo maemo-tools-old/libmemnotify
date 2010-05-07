@@ -98,11 +98,14 @@ class MEMNOTIFY_EXPORT Platform
     SystemMemory& memory();
 
     /* Access to most often used folders */
-    const char* mountPoint() const;
+    const char* syspart() const;
 
-    /* Path to specific file - in default folder, home folder or some path */
-    /* true if file is exists, false - not hanled or not exists            */
+    /* Path to specific file - in default folder, home folder, process cgroup filder */
+    /* or some path. True if file is exists, false - not hanled or not exists        */
     bool path(const char* name, char* buffer, unsigned size) const;
+
+    /* Current process cgroup status, loaded as /proc/self/cgroup */
+    const char* cgroup() const;
 
     /* Options reading */
     const Options& options() const;
@@ -118,12 +121,12 @@ class MEMNOTIFY_EXPORT Platform
   private:
 
     SystemMemory   myMemory;      /* Information about system memory                    */
-    char*          myMountPoint;  /* mount point of system partition, /syspart          */
+    char*          mySyspart;     /* mount point of system partition, /syspart          */
     Options        myOptions;     /* parsed options                                     */
 
   private:
 
-    bool setMountPoint(const char*);
+    bool syspart(const char*);
     bool parseOptions();
 
     static Platform* ourPlatform;
@@ -188,9 +191,9 @@ inline Platform::SystemMemory& Platform :: memory()
   return myMemory;
 }
 
-inline const char* Platform :: mountPoint() const
+inline const char* Platform :: syspart() const
 {
-  return myMountPoint;
+  return mySyspart;
 }
 
 inline const Platform::Options& Platform :: options() const

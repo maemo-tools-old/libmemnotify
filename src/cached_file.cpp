@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <memnotify/platform.hpp>
 #include <memnotify/cached_file.hpp>
 
 BEGIN_MEMNOTIFY_NAMESPACE
@@ -41,9 +42,11 @@ BEGIN_MEMNOTIFY_NAMESPACE
 CachedFile :: CachedFile(const char* sPath, const unsigned msUpdateInteval)
   : myPath(NULL), myHandler(-1), myText(NULL), myActual(0,0), myUpdate(msUpdateInteval * 1000)
 {
-  if (sPath && *sPath)
+  char buf[BUFSIZ];
+
+  if ( Platform::defaultObject().path(sPath, buf, sizeof(buf)) )
   {
-    myPath    = strdup(sPath);
+    myPath    = strdup(buf);
     myHanlder = open(myPath, O_RDONLY|O_DIRECT|O_NOATIME);
   }
 } /* CachedFile */

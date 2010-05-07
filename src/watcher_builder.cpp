@@ -40,7 +40,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 
 static _BUILDER_INFO* WatcherBuilder :: ourBuilders = NULL;
 
-Watcher* WatcherBuilder :: build(const QString& theName, const QSettings& theData)
+Watcher* WatcherBuilder :: build(const QSettings& theData, const QString& theName)
 {
   const QString scanner( theData.value(theName + "/type").toString() );
 

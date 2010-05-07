@@ -31,6 +31,7 @@
 #include <string.h>
 
 #include <memnotify/platform.hpp>
+#include <memnotify/cached_file.hpp>
 
 BEGIN_MEMNOTIFY_NAMESPACE
 
@@ -61,21 +62,21 @@ static Platform* Platform :: ourPlatform = NULL;
 
 
 Platform :: Platform()
-  : myMemory(), myMountPoint(NULL), myOptions()
+  : myMemory(), mySyspart(NULL), myOptions()
 {
     parseOptions();
 
     /* Now check the mount point for cgroups */
-    if ( !setMountPoint(option("cgroups_mount_point")) )
+    if ( !syspart(option("cgroups_mount_point")) )
     {
-      setMountPoint(MEMNOTIFY_CGROUPS_MOUNT_POINT);
+      syspart(MEMNOTIFY_CGROUPS_MOUNT_POINT);
     }
 }
 
 Platform :: ~Platform()
 {
-  if ( myMountPoint )
-    free(myMountPoint);
+  if ( mySyspart )
+    free(mySyspart);
 }
 
 bool Platform :: parseOptions()
@@ -102,41 +103,42 @@ bool Platform :: parseOptions()
   return false;
 } /* parseOptions */
 
-bool Platform :: setMountPoint(const char* str)
+bool Platform :: syspart(const char* str)
 {
   if (str && *str && 0 == access(str, F_OK))
   {
-    if (myMountPoint)
-      free(myMountPoint);
-    myMountPoint = strdup(str);
-    return (NULL != myMountPoint);
+    if (mySyspart)
+      free(mySyspart);
+    mySyspart = strdup(str);
+    return (NULL != mySyspart);
   }
   else
   {
     return false;
   }
-}  /* setMountPoint */
+}  /* syspart */
 
 bool Platform :: path(const char* name, char* buffer, unsigned size) const
 {
   /*
-    Control files could be located:
+    Files could be located:
     - /etc/memnotify folder as a system-wide specification, accessible as "platform.mn"
     - $HOME folder - as user-only specification, accessible as "./quake3/memory.mn"
     - some path which you like, e.g. "/etc/defaults/quake.mn"
+    - cgroup:/name_in_cgroup - in current process cgroup
   */
-
   if (!name || !*name)
     return false;
 
   if (!buffer || !size)
     return false;
 
+  const char cgroup[] = "cgroup:";
   const unsigned nlen = strlen(name);
   const unsigned clen = sizeof(MEMNOTIFY_CONF_PATH) - 1;
 
-  /* Worst case required size estimation */
-  if (nlen + clen + 4 >= size)
+  /* Worst case required size estimation + .nm extension */
+  if (nlen + clen + 8 >= size)
     return false;
 
   if ('/' == *name)
@@ -158,6 +160,18 @@ bool Platform :: path(const char* name, char* buffer, unsigned size) const
     memcpy(buffer + hlen, name, nlen);
     buffer[nlen + hlen] = 0;
   }
+  else if (0 == strncmp(cgroup, name, sizeof(cgroup)-1))
+  {
+    /* replacing cgroup:/somefile to /syspart/current_group_path/somefile */
+    const char* current_group = strrchr(cgroup(), ':');
+    if ( current_group )
+      current_group++;
+    else
+      return false;
+
+    const int rc = snprintf(buffer, size, "%s%s%s", syspart(), current_group, name + sizeof(cgroup) - 1);
+    return (rc > 0 && (unsigned)rc < size && 0 == access(buffer, R_OK));
+  }
   else
   {
     /* File located in default folder */
@@ -167,7 +181,7 @@ bool Platform :: path(const char* name, char* buffer, unsigned size) const
   }
 
   /* Verify extension */
-  if ( !strrchr(buffer, '.') )
+  if (NULL == strrchr(buffer, '.'))
   {
     strcat(buffer, ".mn");
   }
@@ -175,11 +189,22 @@ bool Platform :: path(const char* name, char* buffer, unsigned size) const
   return (0 == access(buffer, R_OK));
 } /* path */
 
+const char* Platform :: cgroup() const
+{
+  /* That is common for whole process - we can use static variable opened on demand */
+  static CachedFile* cgf = NULL;
+
+  if (NULL == cgf)
+    cgf = new CachedFile("/proc/self/cgroup");
+
+  return (cgf && cgf->load() ? cgf->text() : NULL);
+} /* cgroup */
+
 void Platform :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("Platform %08x { myMountPoint '%s' ",
-          (unsigned)this, myMountPoint
+  printf ("Platform %08x { mySyspart '%s' ",
+          (unsigned)this, mySyspart
     );
 
   printf ("options %08x = [", (unsigned)(&myOptions));

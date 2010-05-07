@@ -32,6 +32,8 @@
 #include <QSettings>
 #include <QStringList>
 #include <memnotify/definitions.hpp>
+#include <memnotify/platform.hpp>
+#include <memnotify/cached_file.hpp>
 
 QT_BEGIN_HEADER
 BEGIN_MEMNOTIFY_NAMESPACE
@@ -51,19 +53,30 @@ class MEMNOTIFY_EXPORT Watcher
 {
   public:
 
-    Watcher(const QString& theName, const QSettings& theData);
+    typedef Platform::Size  Size;
+
+  public:
+
+    Watcher(const QSettings& theData, const QString& theName);
     virtual ~Watcher();
 
-    /* request for name of this watcher/threshold */
-    const QString& name() const;
+    /* That is watcher data for decision making */
+    const QString& name() const;        /* Name of this watcher/threshold       */
+    const QString& type() const;        /* Type of watcher (debug, cgroups etc) */
+
+    /* That is theshold parameters, when we raise the memory change signal */
+    Size memoryFree()  const; /* amount of free memory in bytes when should raise trigger */
+    Size memoryUsed()  const; /* amount of used memory in bytes when should raise trigger, conflicts with "free" */
+    Size memoryLimit() const; /* limit of memory in system to be used in addition to platform value */
 
     /* change the watcher activity and change watching to enabled, disabled */
-    virtual bool enable()  = 0;
-    virtual bool disable() = 0;
+    virtual bool enable();
+    virtual bool disable();
             bool enabled() const;
 
     /* handle an external event when it is necessary, return true if event handled properly */
-    virtual bool handle() = 0;
+    /* returns true if event proceeed and may change state() if threshold crossed up/down   */
+    virtual bool process() = 0;
 
     /* ask for handler to make detachable poll()/epoll() */
     int   handler() const;
@@ -79,13 +92,23 @@ class MEMNOTIFY_EXPORT Watcher
 
   protected:
 
-    QString   myName;
-    int       myHandler;
-    bool      myState;
+    QString   myName;       /* Name of theshold, for example "System Memory Low" */
+    QString   myType;       /* Type of threshold watcher, e.g. "cgroups_control" */
+    QString   mySensorPath; /* Path to sensor file, e.g. /syspart/memory.memsw.memory_usage_in_bytes */
+
+    Size  myMemoryFree;   /* Amount of memory in sensor file which triggers theshold on/off, conflicts "used" */
+    Size  myMemoryUsed;   /* Amount of used memory which triggers threshold on/off, conflicts with "free"     */
+    Size  myMemoryLimit;  /* Memory limit, by default should be set to Platform::memory().total()             */
+
+    int         myHandler;  /* Handler which is used to track changes (e.g. inotify or eventfd) */
+    CachedFile* mySensor;   /* The sensor file if necessary, this file will have actual changes */
+    bool        myState;    /* Current state which reflects real theshold value - on/off        */
 
   protected:
 
-    QVariant value(const QSettings& theData, const char* theKey, const QVariant& theDefVal = QVariant()) const;
+    QString option(const QSettings& theData, const char* theKey, const QVariant& theDefVal = QVariant()) const;
+    Size    memoryOption(const QSettings& theData, const char* theKey);
+    bool    percents(Size memoryOptionValue);
 
 }; /* Class Watcher */
 
@@ -98,9 +121,54 @@ inline const QString& Watcher :: name() const
   return myName;
 }
 
+inline const QString& Watcher :: type() const
+{
+  return myType;
+}
+
+inline const QString& Watcher :: sensor() const
+{
+  return mySensor;
+}
+
+inline Size Watcher :: memoryFree()  const
+{
+  return myMemoryFree;
+}
+
+inline Size Watcher :: memoryUsed()  const
+{
+  return myMemoryUsed;
+}
+
+inline Size Watcher :: memoryLimit() const
+{
+  return myMemoryLimit;
+}
+
+inline bool Watcher :: enable()
+{
+  if (mySensorPath.isEmpty() || mySensor)
+    return true;
+
+  mySensor = new CachedFile(mySensorPath);
+  return (mySensor && mySensor->valid());
+}
+
+inline bool Watcher :: disable()
+{
+  if (mySensor)
+  {
+    delete mySensor;
+    mySensor = NULL;
+  }
+
+  return true;
+}
+
 inline bool Watcher :: enabled() const
 {
-  return (myHandler >= 0);
+  return (myHandler >= 0 && mySensor);
 }
 
 inline int Watcher :: handler() const
@@ -114,15 +182,23 @@ inline bool Watcher :: state() const
   return (enabled() && myState);
 }
 
-/* validate file status and contents */
 inline bool Watcher :: valid() const
 {
-  return (myHandler >= 0);
+  char tmp[256];
+
+  return ( myMemoryFree && myMemoryUsed && myMemoryLimit &&
+          Platform::defaultObject().path(mySensorPath.toAscii().constData(), tmp, sizeof(tmp)) );
 }
 
-inline QVariant  Watcher :: value(const QSettings& theData, const char* theKey, const QVariant& theDefVal) const
+inline QString Watcher :: option(const QSettings& theData, const char* theKey, const QVariant& theDefVal) const
 {
-  return theData.value(myName + "/" + QString(theKey), theDefVal);
+  return theData.value(myName + "/" + QString(theKey), theDefVal).toString();
+}
+
+/* just some sugar to decision making - percents or real bytes provided */
+inline bool Watcher :: percents(Size memoryOptionValue)
+{
+  return (memoryOptionValue > 0 && memoryOptionValue <= 100);
 }
 
 END_MEMOTIFY_NAMESPACE

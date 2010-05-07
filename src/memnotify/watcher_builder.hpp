@@ -91,15 +91,15 @@ class MEMNOTIFY_EXPORT WatcherBuilder
 
       private:
 
-        static W* build(const QString& theName, const QSettings& theData)
+        static W* build(const QSettings& theData, const QString& theName)
         {
-          return new W(theName, theData);
+          return new W(theData, theName);
         }
     }; /* Class Announcer */
 
   public:
 
-    static Watcher* build(const QString& theName, const QSettings& theData);
+    static Watcher* build(const QSettings& theData, const QString& theName);
     static bool  announce(_BUILDER_INFO* info);
     static void  dump();
 
