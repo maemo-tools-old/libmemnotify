@@ -41,7 +41,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 Watcher :: Watcher(const QSettings& theData, const QString& theName)
   : myName(theName), myType(option(theData, "type")), mySensorPath(option(theData, "sensor")),
     myMemoryFree(memoryOption(theData, "free")), myMemoryUsed(memoryOption(theData, "used")), myMemoryLimit(memoryOption(theData, "limit")),
-    myHandler(-1), mySensor(NULL), myState(false)
+    myHandler(-1), mySensor(NULL), myState(false), myEventsCounter(0)
 {
   unsigned max_memory_usage = 100;
 
@@ -159,9 +159,9 @@ Size Watcher :: memoryOption(const QSettings& theData, const char* theKey);
 void Watcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-    printf ("Watcher %08x: name '%s' type '%s' sensor '%s' free %u used %u total %u handler %d state %d   ",
+    printf ("Watcher %08x: name '%s' type '%s' sensor '%s' free %u used %u total %u handler %d state %d events %u   ",
             (unsigned)this, myName.toAscii().constData(), myType.toAscii().constData(), mySensorPath.toAscii().constData(),
-            myMemoryFree, myMemoryUsed, myMemoryLimit, myHander, myState
+            myMemoryFree, myMemoryUsed, myMemoryLimit, myHander, myState, myEventsCounter
     );
     if ( mySensor )
       mySensor->dump();

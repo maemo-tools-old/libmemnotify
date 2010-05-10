@@ -46,9 +46,11 @@ BEGIN_MEMNOTIFY_NAMESPACE
   \macro ANNOUNCE_WATCHER
   \relates <memnotify/watcher_builder.hpp>
   Registration of pointed watcher object to be constructed according to type name and using pointed Watcher class.
-  Example: ANNOUNCE_WATCHER("cgroups_control", CgroupsWatcher);
+  Example:
+    ANNOUNCE_WATCHER(CgroupsWatcher, cgroups_control);
+    ANNOUNCE_WATCHER(CgroupsWatcher, cgroups);
 */
-#define ANNOUNCE_WATCHER(N,W)    static const WatcherBuilder::Announcer<W>(N)
+#define ANNOUNCE_WATCHER(W,N)    static const WatcherBuilder::Announcer<W> announce ## W ## N (#N)
 
 
 /*!

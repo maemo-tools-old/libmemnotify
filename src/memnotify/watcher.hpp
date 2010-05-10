@@ -67,7 +67,7 @@ class MEMNOTIFY_EXPORT Watcher
     /* That is theshold parameters, when we raise the memory change signal */
     Size memoryFree()  const; /* amount of free memory in bytes when should raise trigger */
     Size memoryUsed()  const; /* amount of used memory in bytes when should raise trigger, conflicts with "free" */
-    Size memoryLimit() const; /* limit of memory in system to be used in addition to platform value */
+    Size memoryLimit() const; /* limit of memory in system to be used in addition to platform value     */
 
     /* change the watcher activity and change watching to enabled, disabled */
     virtual bool enable();
@@ -82,7 +82,10 @@ class MEMNOTIFY_EXPORT Watcher
     int   handler() const;
 
     /* validate current status: true if level reached, false otherwise */
-    bool  state() const;
+    bool state() const;
+
+    /* Statistics of processed events to crossing threshold, we may handle 2 events and return to original state */
+    uint eventsCounter() const;
 
     /* validate file status and contents */
     virtual bool valid() const;
@@ -103,6 +106,7 @@ class MEMNOTIFY_EXPORT Watcher
     int         myHandler;  /* Handler which is used to track changes (e.g. inotify or eventfd) */
     CachedFile* mySensor;   /* The sensor file if necessary, this file will have actual changes */
     bool        myState;    /* Current state which reflects real theshold value - on/off        */
+    uint  myEventsCounter;  /* Number of processed events in process call                       */
 
   protected:
 
@@ -151,6 +155,7 @@ inline bool Watcher :: enable()
   if (mySensorPath.isEmpty() || mySensor)
     return true;
 
+  myEventsCounter = 0;
   mySensor = new CachedFile(mySensorPath);
   return (mySensor && mySensor->valid());
 }
@@ -182,9 +187,15 @@ inline bool Watcher :: state() const
   return (enabled() && myState);
 }
 
+/* Statistics of processed events to crossing threshold */
+inline uint Watcher :: eventsCounter() const
+{
+  return myEventsCounter;
+}
+
 inline bool Watcher :: valid() const
 {
-  char tmp[256];
+  char tmp[PATH_MAX];
 
   return ( myMemoryFree && myMemoryUsed && myMemoryLimit &&
           Platform::defaultObject().path(mySensorPath.toAscii().constData(), tmp, sizeof(tmp)) );

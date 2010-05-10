@@ -42,7 +42,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 CachedFile :: CachedFile(const char* sPath, const unsigned msUpdateInteval)
   : myPath(NULL), myHandler(-1), myText(NULL), myActual(0,0), myUpdate(msUpdateInteval * 1000)
 {
-  char buf[BUFSIZ];
+  char buf[PATH_MAX];
 
   if ( Platform::defaultObject().path(sPath, buf, sizeof(buf)) )
   {

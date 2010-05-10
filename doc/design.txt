@@ -122,21 +122,22 @@ MEMNOTIFY::CachedFile -- file with cached contents, knows how to reload contents
   value()  -- file value
   isValid()-- validate current object (e.g. file exists)
   dump()   -- dump the contents for debugging
-  hash()   -- has value to quick comparison
   path()   -- path to compare
   handler  -- file descriptor to compare
 
-file Watcher
+file Watcher(const QString& name, const QSettings& settings)
 MEMNOTIFY::Watcher    -- object which listen for updates, could be
+  name
   enable
   disable
   handler
+  state()
 
-file EventfdWatcher
-  EventfdWatcher -- uses eventfd for tracking
+file CgroupsWatcher
+  CgroupsWatcher -- uses eventfd for tracking events in cgroups
 
-file InitifyWatcher
-  InotifyWatcher -- uses inotify for tracking
+file DebugWatcher
+  DebugWatcher -- uses inotify for tracking events using debug filess
 
 file WatcherBuilder
 MEMNOTIFY::WatcherBuilder -- makes a controller based on description "type=" and QSettins

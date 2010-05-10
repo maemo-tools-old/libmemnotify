@@ -57,6 +57,9 @@ class MEMNOTIFY_PRIVATE DebugWatcher: public Watcher
     /* validate file status and contents */
     virtual bool valid() const;
 
+    /* dumping internal information to stdout */
+    virtual void dump() const;
+
   private:
 
     int myWatcher;
@@ -80,7 +83,7 @@ DebugWatcher :: ~DebugWatcher()
 /* change the watcher activity and change watching to enabled, disabled */
 bool DebugWatcher :: enable()
 {
-  if ( Watcher::enable() )
+  if (valid() && Watcher::enable() )
   {
     const int ifd = inotify_init();
 
@@ -138,8 +141,8 @@ bool DebugWatcher :: process()
     {
 #if MEMNOTIFY_DUMP
       const char* name = (ep->len ? ep->name : "");
-      printf ("=> %s: inotify event for %d { wd %d mask %u cookie %u name '%s'}\n",
-              __PRETTY_FUNCTION__, myHandler, ep->wd, ep->mask, ep->cookie, name
+      printf ("=> %s: watcher %08x inotify handler %d { wd %d mask %u cookie %u name '%s'}\n",
+              __PRETTY_FUNCTION__, (uint)this, myHandler, ep->wd, ep->mask, ep->cookie, name
           );
 #endif
       cursor += es;
@@ -149,6 +152,9 @@ bool DebugWatcher :: process()
     else
       break;
   } /* while */
+
+  /* Increase number of handled events */
+  myEventsCounter += handled;
 
   /* Now if we had events - need to re-load sensor file */
   if (handled && mySensor->load())
@@ -171,16 +177,26 @@ bool DebugWatcher :: valid() const
 {
   if ( Watcher::valid() )
   {
-    return (mySensor ? mySensor->valid() && myHandler >= 0 : myHandler < 0);
+    return (mySensor ? mySensor->valid() && myHandler >= 0 && myWatcher >= 0 : myHandler < 0 && myWatcher < 0);
   }
   return false;
 } /* valid */
 
+void DebugWatcher :: dump() const
+{
+#if MEMNOTIFY_DUMP
+  printf ("DebugWatcher %08x { ", (unsigned)this);
+  Watcher::dump();
+  printf ("watcher %d\n}\n", myWatcher);
+#endif /* if MEMNOTIFY_DUMP */
+} /* dump */
+
+
 /* ========================================================================= *
- * The DebugWatcher registration.
+ * The DebugWatcher registration as "debug".
  * ========================================================================= */
 
-ANNOUNCE_WATCHER("debug",DebugWather);
+ANNOUNCE_WATCHER(DebugWatcher, debug);
 
 END_MEMOTIFY_NAMESPACE
 

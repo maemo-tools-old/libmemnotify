@@ -29,6 +29,7 @@
 * Includes.
 * ========================================================================= */
 
+#include <limits.h>
 #include <QtCore/QtGlobal>
 
 QT_BEGIN_HEADER
