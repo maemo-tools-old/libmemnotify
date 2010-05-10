@@ -52,7 +52,7 @@ class MEMNOTIFY_EXPORT CachedFile
   public:
 
     /* open pointed file to reloads and specified refresh interval in milliseconds */
-    CachedFile(const char* sPath, const unsigned msUpdateInteval = 1000);
+    CachedFile(const char* sPath, const uint msUpdateInteval = 1000);
     ~CachedFile();
 
     /* load or reload file contents, returns true of success */
@@ -77,7 +77,7 @@ class MEMNOTIFY_EXPORT CachedFile
     int            myHandler;
     char*          myText;
     struct timeval myActual;
-    unsigned       myUpdate;
+    uint           myUpdate;
 
   private:
 

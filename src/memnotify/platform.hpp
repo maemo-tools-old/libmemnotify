@@ -56,7 +56,7 @@ class MEMNOTIFY_EXPORT Platform
   public:
 
     /* Units to report sizes of memory */
-    typedef unsigned long Size;
+    typedef uint long Size;
 
     /* Representation of options passed in MEMNOTIFY_ENV_NAME environement variable. Expected be short (below 10 items) */
     typedef QPair<QString,QString> Option;
@@ -91,9 +91,6 @@ class MEMNOTIFY_EXPORT Platform
 
   public:
 
-    Platform();
-    ~Platform();
-
     /* Information about system memory */
     SystemMemory& memory();
 
@@ -102,7 +99,7 @@ class MEMNOTIFY_EXPORT Platform
 
     /* Path to specific file - in default folder, home folder, process cgroup filder */
     /* or some path. True if file is exists, false - not hanled or not exists        */
-    bool path(const char* name, char* buffer, unsigned size) const;
+    bool path(const char* name, char* buffer, uint size) const;
 
     /* Current process cgroup status, loaded as /proc/self/cgroup */
     const char* cgroup() const;
@@ -126,9 +123,15 @@ class MEMNOTIFY_EXPORT Platform
 
   private:
 
+    /* That is not expected to have such objects constructed outside defaultObject() call */
+    Platform();
+    ~Platform();
+
+    /* Miscellaneous methods to support Platform */
     bool syspart(const char*);
     bool parseOptions();
 
+    /* Shared data for singletone object */
     static Platform* ourPlatform;
 } /* Class Platform */
 

@@ -129,8 +129,8 @@ bool DebugWatcher :: process()
   /* prepare data for handling */
   char buf[BUFSIZ];
   ssize_t loaded = read(myHandle, buf, sizeof(buf));
-  const unsigned char* cursor = (const unsigned char*)buf;
-  unsigned handled = 0;
+  const uint char* cursor = (const uint char*)buf;
+  uint handled = 0;
 
   while (loaded >= sizeof(struct inotify_event))
   {
@@ -185,7 +185,7 @@ bool DebugWatcher :: valid() const
 void DebugWatcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("DebugWatcher %08x { ", (unsigned)this);
+  printf ("DebugWatcher %08x { ", (uint)this);
   Watcher::dump();
   printf ("watcher %d\n}\n", myWatcher);
 #endif /* if MEMNOTIFY_DUMP */

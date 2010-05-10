@@ -149,13 +149,13 @@ bool CgroupsWatcher :: process()
   char buf[BUFSIZ];
   ssize_t loaded = read(myHandle, buf, sizeof(buf));
   const quint64* cursor = (const quint64*)buf;
-  unsigned handled = 0;
+  uint handled = 0;
 
   while (loaded >= sizeof(*cursor))
   {
 #if MEMNOTIFY_DUMP
     printf ("=> %s: watcher %08x eventfd handler %d evendfd %016llx\n",
-            __PRETTY_FUNCTION__, (unsigned)this, myHandler, *cursor
+            __PRETTY_FUNCTION__, (uint)this, myHandler, *cursor
         );
 #endif
     loaded -= sizeof(*cursor);
@@ -196,7 +196,7 @@ bool CgroupsWatcher :: valid() const
 void CgroupsWatcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("CgroupsWatcher %08x { ", (unsigned)this);
+  printf ("CgroupsWatcher %08x { ", (uint)this);
   Watcher::dump();
   printf ("control '%s'\n}\n", myControlPath.toAscii().constData());
 #endif /* if MEMNOTIFY_DUMP */

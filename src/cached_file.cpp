@@ -39,7 +39,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 * Class CachedFile.
 * ========================================================================= */
 
-CachedFile :: CachedFile(const char* sPath, const unsigned msUpdateInteval)
+CachedFile :: CachedFile(const char* sPath, const uint msUpdateInteval)
   : myPath(NULL), myHandler(-1), myText(NULL), myActual(0,0), myUpdate(msUpdateInteval * 1000)
 {
   char buf[PATH_MAX];
@@ -105,7 +105,7 @@ void CachedFile :: dump() const
 {
 #if MEMNOTIFY_DUMP
   printf ("CachedFile %08x: path '%s' hander %d actual %u.%06u update %u text '%s'\n",
-          (unsigned)this, myPath, myHander, myActual.tv_sec, myActual.tv_usec, myUpdate, myText
+          (uint)this, myPath, myHander, myActual.tv_sec, myActual.tv_usec, myUpdate, myText
     );
 #endif /* if MEMNOTIFY_DUMP */
 }

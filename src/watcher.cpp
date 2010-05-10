@@ -43,7 +43,7 @@ Watcher :: Watcher(const QSettings& theData, const QString& theName)
     myMemoryFree(memoryOption(theData, "free")), myMemoryUsed(memoryOption(theData, "used")), myMemoryLimit(memoryOption(theData, "limit")),
     myHandler(-1), mySensor(NULL), myState(false), myEventsCounter(0)
 {
-  unsigned max_memory_usage = 100;
+  uint max_memory_usage = 100;
 
   /* Now evaluating memory limits */
   if ( myMemoryLimit )
@@ -160,7 +160,7 @@ void Watcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
     printf ("Watcher %08x: name '%s' type '%s' sensor '%s' free %u used %u total %u handler %d state %d events %u   ",
-            (unsigned)this, myName.toAscii().constData(), myType.toAscii().constData(), mySensorPath.toAscii().constData(),
+            (uint)this, myName.toAscii().constData(), myType.toAscii().constData(), mySensorPath.toAscii().constData(),
             myMemoryFree, myMemoryUsed, myMemoryLimit, myHander, myState, myEventsCounter
     );
     if ( mySensor )

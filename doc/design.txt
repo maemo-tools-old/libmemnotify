@@ -27,10 +27,10 @@ or
 
 The subscription could be done for callback or signal. Callback will be called before signal and might be called from AIO
 thread:
-  static void myListener(const char* name, const bool state)
+  static void myListener(const QString& name, const bool state)
   {
-    printf ("memory signal %s delivered in state %d\n", name, state);
-    if (state && 0 == strcmp(name, "System Memory Low"))
+    printf ("memory signal %s delivered in state %d\n", name.toAscii().constData(), state);
+    if (state && name == "System Memory Low")
     {
       FlushMyMemory();
     }
@@ -38,7 +38,7 @@ thread:
   notify.addListener(myListener);
 
 Then you may initiate listening events
-  if ( !notify.listen() )     <-- here you may get notifications for all thesholds which set to true.
+  if ( !notify.pollWatchers() )     <-- here you may get notifications for all thesholds which set to true.
   {
     oops();
   }
@@ -91,23 +91,23 @@ MEMNOTIFY::MemoryNotification -- Main proxy class to control subscription and pr
 
   static create("path specs")
 
-  bool pollWatchers()  -- starts to listen in automatic mode using aio, required subscription
-  queryWatchers(int* fd, unsigned size); -- queries events descriptors to make poll outside, required subscription
-  handleWatchers(const int* fd, unsigned counter);  -- handles events detected in extenal poll loop. required subscription
+  bool poll()  -- starts to listen in automatic mode using aio, required subscription
+  uint query(int* fd, uint size); -- queries events descriptors to make poll outside, required subscription
+  uint process(const int* fd, uint counter);  -- handles events detected in extenal poll loop. required subscription
 
   enable()  -- enabsle tracking, called automatical when listen() or queryEvents() called
   disable() -- disable tracking, called before destruction of object or if you need re-subscribe
-  query(theshold)
+  watcher(watcherName) -- find Watcher object according to passed name of threshold
 
   # subscription (any or both)
-  signal notified(const char* name, const bool state);
+  signal notified(const QString& name, const bool state);
 
-  typedef void (*MEMNOTIFY_OBSERVER)(const char* name, const bool state);
-  bool addObserver(MEMNOTIFY_OBSERVER observer);
-  bool delObserver(MEMNOTIFY_OBSERVER observer);
+  typedef void (*OBSERVER)(const QString& name, const bool state);
+  bool addObserver(OBSERVER observer);
+  bool delObserver(OBSERVER observer);
 
-  isValid()-- validate current object (e.g. file exists)
-  dump()   -- dump the contents for debugging
+  valid() -- validate current object (e.g. file exists)
+  dump()  -- dump the contents for debugging
 
 Todo:
   1. to create actual observers we can track
@@ -120,7 +120,7 @@ MEMNOTIFY::CachedFile -- file with cached contents, knows how to reload contents
   reload() -- reload file according to specified limit
   text()   -- file contents as a text (const char*)
   value()  -- file value
-  isValid()-- validate current object (e.g. file exists)
+  valid()  -- validate current object (e.g. file exists)
   dump()   -- dump the contents for debugging
   path()   -- path to compare
   handler  -- file descriptor to compare

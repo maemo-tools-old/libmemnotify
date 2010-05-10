@@ -1,5 +1,5 @@
 /* ========================================================================= *
- * File: watcher_builder.cpp
+ * File: memory_notification.cpp
  *
  * This file is part of Memory Notification Library (libmemnotifyqt)
  *
@@ -30,64 +30,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <memnotify/watcher_builder.hpp>
+#include <memnotify/memory_notification.hpp>
 
 BEGIN_MEMNOTIFY_NAMESPACE
 
 /* ========================================================================= *
-* Class WatcherBuilder.
+* Class MemoryNotification.
 * ========================================================================= */
 
-static _BUILDER_INFO* WatcherBuilder :: ourBuilders = NULL;
 
-Watcher* WatcherBuilder :: build(const QSettings& theData, const QString& theName)
-{
-  const QString scanner( theData.value(theName + "/type").toString() );
-
-  /* Make a lookup only if controller type name looks sane */
-  if (scanner.length() > 1)
-  {
-    for (const _BUILDER_INFO* cursor = ourBuilders; cursor; cursor = cursor->mySucc)
-    {
-      Q_ASSERT(cursor->myType);
-      Q_ASSERT(cursor->myFunc);
-      if (scanner == cursor->myType)
-        return cursor->myFunc(theName, theData);
-    } /* for */
-  }
-
-  /* Nothing found */
-  return NULL;
-} /* build */
-
-bool WatcherBuilder :: announce(_BUILDER_INFO* info)
-{
-  if (info && info->myType && info->myFunc)
-  {
-    info->mySucc = ourBuilders;
-    ourBuilders  = info;
-    return true;
-  }
-
-  return false;
-} /* announce */
-
-void WatcherBuilder :: dump()
+void MemoryNotification :: dump()
 {
 #if MEMNOTIFY_DUMP
-  printf ("WatcherBuilder %08x {\n", (uint)ourBuilders);
+  printf ("MemoryNotification %08x {\n", (uint)this);
 
-  for (const _BUILDER_INFO* cursor = ourBuilders; cursor; cursor = cursor->mySucc)
-  {
-    printf ("   _BUILDER_INFO %08x: type '%s' func %08x succ %08x\n",
-          (uint)cursor, cursor->myType, (unsigned)(cursor->myFunc), (unsigned)(cursor->mySucc)
-      );
-  }
-
+ZZZ
   printf ("}\n");
 #endif /* if MEMNOTIFY_DUMP */
 }
 
 END_MEMOTIFY_NAMESPACE
 
-/* =================[ end of file memnotify/watcher_builder.cpp ]========================= */
+/* =================[ end of file memnotify/memory_notification.cpp ]========================= */

@@ -44,7 +44,7 @@ void Platform::SystemMemory :: dump() const
 {
 #if MEMNOTIFY_DUMP
   printf ("Platform::SystemMemory %08x { actual %u uptime %ld memory unit %u\n"
-      (unsigned)this, (unsigned)myActual, mySysinfo.uptime, mySysinfo.mem_unit
+      (uint)this, (uint)myActual, mySysinfo.uptime, mySysinfo.mem_unit
     );
 
   printf ("   ram: total %u free %u shared %u buffer %u; swap: total %u free %u; high: total %u free %u\n}\n"
@@ -118,7 +118,7 @@ bool Platform :: syspart(const char* str)
   }
 }  /* syspart */
 
-bool Platform :: path(const char* name, char* buffer, unsigned size) const
+bool Platform :: path(const char* name, char* buffer, uint size) const
 {
   /*
     Files could be located:
@@ -134,8 +134,8 @@ bool Platform :: path(const char* name, char* buffer, unsigned size) const
     return false;
 
   const char cgroup[] = "cgroup:";
-  const unsigned nlen = strlen(name);
-  const unsigned clen = sizeof(MEMNOTIFY_CONF_PATH) - 1;
+  const uint nlen = strlen(name);
+  const uint clen = sizeof(MEMNOTIFY_CONF_PATH) - 1;
 
   /* Worst case required size estimation + .nm extension */
   if (nlen + clen + 8 >= size)
@@ -151,7 +151,7 @@ bool Platform :: path(const char* name, char* buffer, unsigned size) const
   {
     /* home folder next */
     const char*    home = getenv("HOME");
-    const unsigned hlen = strlen(home);
+    const uint hlen = strlen(home);
 
     if (nlen + hlen + 4 >= size)
       return false;
@@ -170,7 +170,7 @@ bool Platform :: path(const char* name, char* buffer, unsigned size) const
       return false;
 
     const int rc = snprintf(buffer, size, "%s%s%s", syspart(), current_group, name + sizeof(cgroup) - 1);
-    return (rc > 0 && (unsigned)rc < size && 0 == access(buffer, R_OK));
+    return (rc > 0 && (uint)rc < size && 0 == access(buffer, R_OK));
   }
   else
   {
@@ -204,10 +204,10 @@ void Platform :: dump() const
 {
 #if MEMNOTIFY_DUMP
   printf ("Platform %08x { mySyspart '%s' ",
-          (unsigned)this, mySyspart
+          (uint)this, mySyspart
     );
 
-  printf ("options %08x = [", (unsigned)(&myOptions));
+  printf ("options %08x = [", (uint)(&myOptions));
   foreach (Option option, myOptions)
   {
     printf ("%s = %s;", option.first.toAscii().constData(), option.second.toAscii().constData());
