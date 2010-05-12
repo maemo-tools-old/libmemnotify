@@ -38,6 +38,126 @@ BEGIN_MEMNOTIFY_NAMESPACE
 * Class MemoryNotification.
 * ========================================================================= */
 
+static MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
+
+
+MemoryNotification :: MemoryNotification()
+  : myObservers(), myWatchers(), mySignalCounter(0), myEnabled(false)
+{}
+
+MemoryNotification :: ~MemoryNotification()
+{
+  if ( myEnabled )
+    disable();
+
+  /* Clean up watchers with memory removal */
+  foreach (Watcher* watcher, myWatchers)
+  {
+    if (watcher)
+      delete watcher;
+  }
+  myWatchers.clear();
+
+  /* Clean up observers */
+  myObservers.clear();
+
+  if (ourMemoryNotification == this)
+    ourMemoryNotification = NULL;
+} /* ~MemoryNotification */
+
+bool MemoryNotification :: setup(const char* pathSpecification)
+{
+  return false;
+}
+
+bool MemoryNotification :: poll()
+{ return false; }
+
+uint MemoryNotification :: query(int* fds, uint size)
+{ return false; }
+
+bool MemoryNotification :: process(const int* fds, uint counter)
+{ return false; }
+
+bool MemoryNotification :: enable()
+{
+  if ( myEnabled )
+    return false;
+
+  if (0 == mySignalCounter && myObservers.isEmpty())
+    return false;
+
+  if ( myWatchers.isEmpty() )
+    return false;
+
+  /* disable watchers one by one */
+  int enabled_counter = 0;
+  foreach(Watcher* watcher, myWatchers)
+  {
+    if (watcher && watcher->enable())
+    {
+      /* item successfully enabled */
+      enabled_counter++;
+    }
+  }
+
+  /* set common enabled flag on only if we have all items enabled */
+  myEnabled = (myWatchers->count() == enabled_counter);
+
+  /* function done if no items enabled */
+  return (myEnabled);
+} /* enable */
+
+bool MemoryNotification :: disable()
+{
+  if ( !myEnabled )
+    return false;
+
+  /* disable watchers one by one */
+  int disabled_counter = 0;
+  foreach(Watcher* watcher, myWatchers)
+  {
+    if (watcher && watcher->disable())
+    {
+      /* item successfully disabled */
+      disabled_counter++;
+    }
+  }
+
+  /* set common enabled flag off only if we have all items disabled */
+  myEnabled = (myWatchers->count() != disabled_counter);
+
+  /* function done if no items enabled */
+  return (! myEnabled);
+} /* disable */
+
+bool MemoryNotification :: valid() const
+{
+  /* first, we must have subscribed items */
+  if (0 == mySignalCounter && myObservers.isEmpty())
+    return false;
+
+  /* we must have sources for signal generation */
+  if ( myWatchers.isEmpty() )
+    return false;
+
+  /* All observers must be non-null */
+  if ( myObservers.indexOf(NULL) >= 0 )
+    return false;
+
+  /* All watchers must be non-null, valid and maybe enabled */
+  foreach(const Watcher* watcher, myWatchers)
+  {
+    if (watcher && watcher->valid() && watcher->enabled() == myEnabled)
+    {
+      /* check the next item */
+      continue;
+    }
+    return false;
+  }
+
+  return true;
+} /* valid */
 
 void MemoryNotification :: dump()
 {

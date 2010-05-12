@@ -83,6 +83,9 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
     bool addObserver(OBSERVER observer);
     bool delObserver(OBSERVER observer);
 
+    /* Statistics of processed events to crossing thresholds */
+    uint eventsCounter() const;
+
     /* validates object and returns true if it created correct */
     bool valid() const;
 
@@ -111,9 +114,11 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
     /* Shared singletone data */
     static MemoryNotification*  ourMemoryNotification;
 
-
-    uint  mySignalCounter;
-    uint  myEnableCounter;
+    /* That is instance data */
+    QList<OBSERVER> myObservers;  /* list of observers, expected to be 1 or 2 usually, 10+ means design problems            */
+    QList<Watcher*> myWatchers;   /* list of watchers/thresholds, expected to be 1 or 2 usually, 10+ means design problems  */
+    uint        mySignalCounter;  /* how many objects called connect() for this one as a source */
+    bool        myEnabled;        /* are we enabled or disabled? Just for fast checks           */
 
 }; /* Class MemoryNotification */
 
@@ -121,6 +126,97 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
 /* ========================================================================= *
  * Inline methods for MemoryNotification.
  * ========================================================================= */
+
+inline Watcher* MemoryNotification :: watcher(const char* name) const
+{
+  if (name && *name)
+  {
+    const QString scanner(name);
+    foreach(Watcher* watcher, myWatchers)
+    {
+      Q_ASSERT(watcher != NULL);
+      if (scanner == watcher->name())
+        return watcher;
+    }
+  }
+
+  return NULL;
+} /* watcher */
+
+inline bool MemoryNotification :: addObserver(OBSERVER observer)
+{
+  if ( !observer )
+    return false;
+
+  if (myObservers.count() > 0 && myObservers.indexOf(observer) >= 0)
+    return false;
+
+  myObservers.append(observer);
+  return true;
+} /* addObserver */
+
+inline bool MemoryNotification :: delObserver(OBSERVER observer)
+{
+  if ( !observer )
+    return false;
+
+  if (myObservers.isEmpty())
+    return false;
+
+  return myObservers.removeOne(observer);
+} /* delObserver */
+
+inline uint MemoryNotification :: eventsCounter() const
+{
+  uint counter = 0;
+  foreach (const Watcher* watcher, myWatchers)
+  {
+    Q_ASSERT(watcher != NULL);
+    counter += watcher->eventsCounter();
+  }
+  return counter;
+} /* eventsCounter */
+
+inline void MemoryNotification :: connectNotify(const char* signal)
+{
+    mySignalCounter++;
+    QObject::connectNotify();
+}
+
+inline void MemoryNotification :: disconnectNotify(const char* signal)
+{
+  if (mySignalCounter > 0)
+    mySignalCounter--;
+  QObject::disconnectNotify();
+}
+
+inline MemoryNotification* MemoryNotification :: create(const char* pathSpecification)
+{
+  MemoryNotification* instance = new MemoryNotification();
+
+  if ( instance )
+  {
+    if ( instance->setup(pathSpecification) )
+      return instance;
+    delete instance;
+  }
+
+  /* Here we have a problems */
+  return NULL;
+} /* create */
+
+inline MemoryNotification& MemoryNotification :: defaultObject()
+{
+  if ( !ourMemoryNotification )
+  {
+    ourMemoryNotification = new MemoryNotification();
+    Q_ASSERT(ourMemoryNotification != NULL);
+    if (ourMemoryNotification)
+      ourMemoryNotification->setup(NULL);
+  }
+
+  return (*ourMemoryNotification);
+} /* defaultObject */
 
 
 END_MEMOTIFY_NAMESPACE

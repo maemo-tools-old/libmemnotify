@@ -38,7 +38,7 @@ thread:
   notify.addListener(myListener);
 
 Then you may initiate listening events
-  if ( !notify.pollWatchers() )     <-- here you may get notifications for all thesholds which set to true.
+  if ( !notify.poll() )     <-- here you may get notifications for all thesholds which set to true.
   {
     oops();
   }

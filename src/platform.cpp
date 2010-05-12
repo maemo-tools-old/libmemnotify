@@ -77,6 +77,10 @@ Platform :: ~Platform()
 {
   if ( mySyspart )
     free(mySyspart);
+
+  /* We should handle delete &Platform::defaultObject(); */
+  if (ourPlatform == this)
+    ourPlatform = NULL;
 }
 
 bool Platform :: parseOptions()
