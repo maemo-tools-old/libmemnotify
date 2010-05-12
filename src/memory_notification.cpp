@@ -74,7 +74,21 @@ bool MemoryNotification :: poll()
 { return false; }
 
 uint MemoryNotification :: query(int* fds, uint size)
-{ return false; }
+{
+  uint index = 0;
+  if (myEnabled && fd && myWatchers->count() <= (int)size)
+  {
+    foreach(const Watcher* watcher, myWatchers)
+    {
+      const int handler = (watcher ? watcher->handler() : -1);
+      if ( handler < 0 )
+        return 0;
+      fds[index++] = handler;
+    }
+  }
+
+  return index;
+} /* query */
 
 bool MemoryNotification :: process(const int* fds, uint counter)
 { return false; }
