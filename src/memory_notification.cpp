@@ -279,8 +279,31 @@ void MemoryNotification :: dump()
 {
 #if MEMNOTIFY_DUMP
   printf ("MemoryNotification %08x {\n", (uint)this);
+  printf ("  outMemoryNotification %08x signal counter %u enabled %d poll thread %08x\n",
+          (uint)ourMemoryNotification, mySignalCounter, myEnabled, (uint)myThread
+      );
 
-ZZZ
+  printf ("  observers %d {\n", myObservers.count());
+  for (const OBSERVER observer, myObservers)
+  {
+    printf ("\t%08x\n", (uint)observer);
+  }
+  printf ("  }\n");
+
+  printf ("  watchers %d {\n", myWatchers.count());
+  for (const Watchers watcher, myWatchers)
+  {
+    printf ("\t%08x ", (uint)watcher);
+    if (watcher)
+      watcher->dump();
+    else
+      printf ("\n");
+  }
+  printf ("  }\n");
+
+  if ( myThread )
+    ((const PollThread*)myThread)->dump();
+
   printf ("}\n");
 #endif /* if MEMNOTIFY_DUMP */
 }
