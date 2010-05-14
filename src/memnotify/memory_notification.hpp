@@ -31,6 +31,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QThread>
 #include <memnotify/definitions.hpp>
 #include <memnotify/watcher.hpp>
 
@@ -60,14 +61,15 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
     /* returns true if all watchers/thresholds enabled sussessfully                            */
     bool setup(const char* pathSpecification=NULL);
 
-    /* starts to listen in automatic mode using aio, required subscription */
+    /* starts to listen in automatic mode using aio and temporary thread, required subscription */
     bool poll();
 
     /* queries events descriptors to make poll outside, required subscription */
     /* return the number of filled file descriptors in fds parameter          */
     uint query(int* fds, uint size);
 
-    /* handles events detected in extenal poll loop. required subscription */
+    /* handles events detected in extenal poll loop. required subscription   */
+    /* WARNING: you should pass only fds which have incoming events detected */
     bool process(const int* fds, uint counter);
 
     /* enables tracking, called automatical when listen() or queryEvents() called */
@@ -111,6 +113,9 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
     virtual void connectNotify(const char* signal);
     virtual void disconnectNotify(const char* signal);
 
+    /* Remove all watchers from memory */
+    void clearWatchers();
+
     /* Shared singletone data */
     static MemoryNotification*  ourMemoryNotification;
 
@@ -119,6 +124,7 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
     QList<Watcher*> myWatchers;   /* list of watchers/thresholds, expected to be 1 or 2 usually, 10+ means design problems  */
     uint        mySignalCounter;  /* how many objects called connect() for this one as a source */
     bool        myEnabled;        /* are we enabled or disabled? Just for fast checks           */
+    QThread*    myThread;         /* the thread to call poll if we are not using the main loop  */
 
 }; /* Class MemoryNotification */
 
@@ -126,6 +132,25 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
 /* ========================================================================= *
  * Inline methods for MemoryNotification.
  * ========================================================================= */
+
+inline MemoryNotification :: MemoryNotification()
+: myObservers(), myWatchers(), mySignalCounter(0), myEnabled(false), myThread(NULL)
+{}
+
+inline MemoryNotification :: ~MemoryNotification()
+{
+  if ( myEnabled )
+    disable();
+
+  /* Clean up watchers with memory removal */
+  clearWatchers();
+
+  /* Clean up observers */
+  myObservers.clear();
+
+  if (ourMemoryNotification == this)
+    ourMemoryNotification = NULL;
+} /* ~MemoryNotification */
 
 inline Watcher* MemoryNotification :: watcher(const char* name) const
 {

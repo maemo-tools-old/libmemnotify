@@ -27,9 +27,12 @@
 * ========================================================================= */
 
 #include <sys/types.h>
+#include <aio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <QSettings>
+#include <memnotify/watcher_builder.hpp>
 #include <memnotify/memory_notification.hpp>
 
 BEGIN_MEMNOTIFY_NAMESPACE
@@ -41,37 +44,57 @@ BEGIN_MEMNOTIFY_NAMESPACE
 static MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
 
 
-MemoryNotification :: MemoryNotification()
-  : myObservers(), myWatchers(), mySignalCounter(0), myEnabled(false)
-{}
-
-MemoryNotification :: ~MemoryNotification()
-{
-  if ( myEnabled )
-    disable();
-
-  /* Clean up watchers with memory removal */
-  foreach (Watcher* watcher, myWatchers)
-  {
-    if (watcher)
-      delete watcher;
-  }
-  myWatchers.clear();
-
-  /* Clean up observers */
-  myObservers.clear();
-
-  if (ourMemoryNotification == this)
-    ourMemoryNotification = NULL;
-} /* ~MemoryNotification */
-
 bool MemoryNotification :: setup(const char* pathSpecification)
 {
-  return false;
-}
+  const bool wasEnabled = myEnabled;
+
+  /* We should disable functionality if it is enabled */
+  if (myEnabled && !disable())
+    return false;
+
+  /* If no files pointed the default file should be loaded */
+  if ( !(pathSpecification && *pathSpecification) )
+    pathSpecification = "default";
+
+  /* if we have some watchers in list - they must be removed */
+  clearWatchers();
+
+  const QStringList files = QString(pathSpecification).split(":", QString::SkipEmptyParts);
+
+  foreach(QString file, files)
+  {
+    const QSettings   config(file, QSettings::IniFormat);
+    /* array with names of thresholds */
+    const QStringList tholds(config.childGroups());
+    /* array with data to create watchers */
+    const QStringList data(config.allKeys());
+
+    /* Now trying to build the watchers, one by one */
+    foreach(QString thold, tholds)
+    {
+      Watcher* newcomer = WatcherBuilder::build(data, thold);
+      Q_ASSERT(NULL != newcomer);
+#if MEMNOTIFY_DUMP
+      Q_ASSERT(true == newcomer->valid());
+#endif
+      if ( newcomer )
+        myWatchers.append(newcomer);
+    } /* for each thold */
+  } /* for each file */
+
+  /* As a result we must have at least one watcher created */
+  if ( myWatchers.isEmpty() )
+    return false;
+
+  /* We should enable functionality back if it was enabled */
+  return (!wasEnabled || enable());
+} /* setup */
 
 bool MemoryNotification :: poll()
-{ return false; }
+{
+  /* FIXME: QThread-based solution for epoll expected. AIO doesn't work as necessary */
+  return false;
+} /* poll */
 
 uint MemoryNotification :: query(int* fds, uint size)
 {
@@ -91,7 +114,73 @@ uint MemoryNotification :: query(int* fds, uint size)
 } /* query */
 
 bool MemoryNotification :: process(const int* fds, uint counter)
-{ return false; }
+{
+  /* we should be enabled */
+  if ( !myEnable )
+    return false;
+
+  /* Check the parameters */
+  if ( !fd )
+    return false;
+
+  if ( !counter )
+    return true;
+
+  /* result of processing, should be true if all watchers handled OK */
+  bool result = true;
+  QList<Watcher*> updated;
+
+  /* And now handling the all incoming events */
+  for (uint ifd = 0; ifd < counter; ifd++)
+  {
+    const int fd = fds[ifd];
+
+    /* First - we should find the watcher */
+    foreach(Watcher* cursor, myWatchers)
+    {
+      Q_ASSERT(NULL != watcher);
+      if (watcher && fd == watcher->handler())
+      {
+        const bool oldState = watcher->state();
+        if ( watcher->process() )
+        {
+          if (oldState != watcher->state())
+            updated.append(watcher);
+        }
+        else
+        {
+          /* we are failed with processing but we must continue until the end */
+          result = false;
+        }
+      }
+    } /* scan for watcher */
+  } /* for each file descriptor */
+
+  /* Now we have list of updated watchers -> sending the notifications */
+  foreach(const Watcher* watcher, updated)
+  {
+    Q_ASSERT(NULL != watcher);
+    const QString& name  = watcher->name();
+    const bool     state = watcher->state();
+
+    /* if necessary - notify callbacks */
+    if (myObservers.count() > 0)
+    {
+      foreach(OBSERVER observer, myObservers)
+      {
+        Q_ASSERT(NULL != observer);
+        if ( observer )
+          observer(name, state);
+      }
+    }
+
+    /* if necessary - notify subscribers */
+    if (mySignalCounter > 0)
+      emit notified(name, state);
+  } /* for each updated */
+
+  return result;
+} /* process */
 
 bool MemoryNotification :: enable()
 {
@@ -172,6 +261,19 @@ bool MemoryNotification :: valid() const
 
   return true;
 } /* valid */
+
+void MemoryNotification :: clearWatchers()
+{
+  if (myWatchers.count() > 0)
+  {
+    foreach (Watcher* watcher, myWatchers)
+    {
+      if (watcher)
+        delete watcher;
+    }
+    myWatchers.clear();
+  }
+} /* clearWatchers */
 
 void MemoryNotification :: dump()
 {
