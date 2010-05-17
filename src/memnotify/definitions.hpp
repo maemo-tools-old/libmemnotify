@@ -47,18 +47,22 @@ QT_BEGIN_HEADER
   \sa END_MEMOTIFY_NAMESPACE
 */
 
+
+/**
+  MEMNOTIFY namespace is disabled for now, see bug http://bugreports.qt.nokia.com/browse/QTBUG-35
+  "moc fails to generate correct code when namespace is declared through macro"
+ */
 #ifdef ENABLE_MEMNOTIFY_NAMESPACE   /* may cause problems with MOC, workaround */
   #ifndef MEMNOTIFY
-    #define MEMNOTIFY     MemNotifyNameSpace
-    namespace MEMNOTIFY   {}
+  #define MEMNOTIFY     MemNotifyNameSpace
+  namespace MEMNOTIFY   {}
   #endif
   #define BEGIN_MEMNOTIFY_NAMESPACE   namespace MEMNOTIFY {
   #define USE_MEMNOTIFY_NAMESPACE     using namespace ::MEMNOTIFY;
   #define END_MEMOTIFY_NAMESPACE      }
 #else
   #ifndef MEMNOTIFY
-    #define MEMNOTIFY
-    namespace MEMNOTIFY   {}
+  #define MEMNOTIFY
   #endif
   #define BEGIN_MEMNOTIFY_NAMESPACE
   #define USE_MEMNOTIFY_NAMESPACE
