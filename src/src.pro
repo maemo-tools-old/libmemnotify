@@ -9,8 +9,14 @@ HEADERS += memnotify/poller.hpp
 HEADERS += memnotify/watcher.hpp 
 HEADERS += memnotify/watcher_builder.hpp
 HEADERS += memnotify/memory_notification.hpp
-# MemoryNotification CachedFile Watcher EventfdWatcher InitifyWatcher WatcherBuilder Platform
-SOURCES += cached_file.cpp cgroups_watcher.cpp debug_watcher.cpp memory_notification.cpp platform.cpp poller.cpp watcher_builder.cpp watcher.cpp
+SOURCES += cached_file.cpp 
+SOURCES += platform.cpp 
+SOURCES += watcher.cpp
+SOURCES += watcher_builder.cpp 
+SOURCES += cgroups_watcher.cpp 
+SOURCES += debug_watcher.cpp 
+SOURCES += poller.cpp 
+SOURCES += memory_notification.cpp 
 DEFINES += QT_DLL MEMNOTIFY_SHARED MEMNOTIFY_VERSION=\\\"$${VERSION}\\\"
 CONFIG  += qt warn_on debug_and_release build_all
 QT -= gui
