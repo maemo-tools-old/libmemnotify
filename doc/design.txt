@@ -84,7 +84,7 @@ type=debug -- this controller will use pointed sensor file with inotify access t
 Classes details
 ---------------
 
-file MemoryNotification
+file memory_notification
 MEMNOTIFY::MemoryNotification -- Main proxy class to control subscription and propagate events
   1. Memory events notifications are not sorted by memory usage, they delivery is based on notifications from low level APIs
   2. If memory level is set to ON you will get notification during subscription (see listen or queryEvents)
@@ -115,7 +115,11 @@ Todo:
     virtual void connectNotify(const char* signal);
     virtual void disconnectNotify(const char* signal);
 
-file CachedFile
+file poller
+  Thread-based poll call if we do not plan to use query/process combination. That is expected to have less 10 thresholds
+  per application and not much updates - so pol() call was used. But it could be replaced to epoll if necessary.
+
+file cached_file
 MEMNOTIFY::CachedFile -- file with cached contents, knows how to reload contents in cheapest way - rewind and read
   reload() -- reload file according to specified limit
   text()   -- file contents as a text (const char*)
@@ -125,7 +129,7 @@ MEMNOTIFY::CachedFile -- file with cached contents, knows how to reload contents
   path()   -- path to compare
   handler  -- file descriptor to compare
 
-file Watcher(const QString& name, const QSettings& settings)
+file watcher
 MEMNOTIFY::Watcher    -- object which listen for updates, could be
   name
   enable
@@ -133,17 +137,16 @@ MEMNOTIFY::Watcher    -- object which listen for updates, could be
   handler
   state()
 
-file CgroupsWatcher
+file cgroups_watcher
   CgroupsWatcher -- uses eventfd for tracking events in cgroups
 
-file DebugWatcher
+file debug_watcher
   DebugWatcher -- uses inotify for tracking events using debug filess
 
-file WatcherBuilder
+file watcher_builder
 MEMNOTIFY::WatcherBuilder -- makes a controller based on description "type=" and QSettins
-MEMNOTIFY::CgroupsWatcherBuilder -- makes a watcher for cgroups controller
-MEMNOTIFY::DebugWatcherBuilder -- makes a watcher for debug controller
 
+file platform
 MEMNOTIFY::Platform -- platform parameters and settings
 - MEMNOTIFY env variable with settings
 - total, free and used memory

@@ -84,8 +84,8 @@ bool MemoryNotification :: setup(const char* pathSpecification)
 
 bool MemoryNotification :: poll()
 {
-  /* trying to enable first if not enabled */
-  if (!myEnabled && !enable())
+  /* we should be enabled first */
+  if (!myEnabled )
     return false;
 
   /* that is strange but possible */

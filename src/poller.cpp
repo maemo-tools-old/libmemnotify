@@ -74,7 +74,7 @@ void Poller :: run()
       return;
 
     /* scans the incoming event */
-    int incoming[ myCounter ];
+    int  incoming[ myCounter ];
     uint iget;
     uint iput;
 
