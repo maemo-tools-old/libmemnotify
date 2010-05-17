@@ -1,5 +1,6 @@
 VERSION = 0.1.0
 TEMPLATE = lib
+TARGET = memnotifyqt
 INCLUDEPATH=.
 HEADERS += memnotify/definitions.hpp
 # MemoryNotification CachedFile Watcher EventfdWatcher InitifyWatcher WatcherBuilder Platform
