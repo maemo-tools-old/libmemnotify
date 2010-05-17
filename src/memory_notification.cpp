@@ -43,7 +43,6 @@ BEGIN_MEMNOTIFY_NAMESPACE
 
 MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
 
-
 bool MemoryNotification :: setup(const char* pathSpecification)
 {
   /* We should disable functionality if it is enabled */

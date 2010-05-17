@@ -22,6 +22,8 @@
  * 02110-1301 USA
  * ========================================================================= */
 
+#ifndef _TEST_MEMORY_NOTIFICATION_
+#define _TEST_MEMORY_NOTIFICATION_
 /* ========================================================================= *
 * Includes.
 * ========================================================================= */
@@ -31,55 +33,43 @@
 #include <string.h>
 
 #include <QCoreApplication>
-#include "test-memory_notification.hpp"
+#include <memnotify/memory_notification.hpp>
 
 
 /* ========================================================================= *
  * Very simple test application
  * ========================================================================= */
 
-static void listenerObserver(const QString& name, const bool state)
+class Listener: public QObject
 {
-  printf ("CALLBACK: memory signal %s delivered in state %d\n", name.toAscii().constData(), state);
-}
+  public:
 
-TestApp::TestApp(int argc, char* argv[]): QCoreApplication(argc, argv), myListener(), myNotification(MEMNOTIFY::MemoryNotification::defaultObject())
+    Q_OBJECT
+
+  public slots:
+
+    inline void notified(const QString& name, const bool state)
+    {
+      printf ("SIGNAL: memory signal %s delivered in state %d\n", name.toAscii().constData(), state);
+      exit(0);
+    }
+};
+
+class TestApp: public QCoreApplication
 {
-  if ( NULL == (&myNotification) )
-  {
-    printf ("nulled notification\n");
-    exit(1);
-  }
+  public:
 
-  if ( !myNotification.addObserver(listenerObserver) )
-  {
-    printf ("addObserver(%08x) failed\n", (uint)listenerObserver);
-    exit(1);
-  }
+    Q_OBJECT
 
-  connect(&myNotification, SIGNAL(notified(const QString&, const bool)), &myListener, SLOT(notified(const QString&, const bool)));
-  myNotification.dump();
+  public:
 
-  if ( !myNotification.valid() )
-  {
-    printf ("MemoryNotification is not valid\n");
-    exit(1);
-  }
-}
+    TestApp(int argc, char* argv[]);
+    ~TestApp();
 
-TestApp::~TestApp()
-{
-  printf ("before destroying MemoryNotification::defaultObject()\n");
-  delete &myNotification;
-  printf ("after destroying MemoryNotification::defaultObject()\n");
-}
+  protected:
 
-int main(int argc, char* argv[])
-{
-  printf ("sanity testing MemoryNotification\n");
-  TestApp app(argc, argv);
+    Listener  myListener;
+    MEMNOTIFY::MemoryNotification& myNotification;
+};
 
-  return app.exec();
-} /* main */
-
-/* =================[ end of file test-memory_notification.cpp ]====================== */
+#endif /* ifdef _TEST_MEMORY_NOTIFICATION_ */

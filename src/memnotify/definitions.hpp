@@ -47,14 +47,24 @@ QT_BEGIN_HEADER
   \sa END_MEMOTIFY_NAMESPACE
 */
 
-#ifndef MEMNOTIFY
-#define MEMNOTIFY     MemNotifyNameSpace
-namespace MEMNOTIFY   {}
-#endif
+#ifdef ENABLE_MEMNOTIFY_NAMESPACE   /* may cause problems with MOC, workaround */
+  #ifndef MEMNOTIFY
+    #define MEMNOTIFY     MemNotifyNameSpace
+    namespace MEMNOTIFY   {}
+  #endif
+  #define BEGIN_MEMNOTIFY_NAMESPACE   namespace MEMNOTIFY {
+  #define USE_MEMNOTIFY_NAMESPACE     using namespace ::MEMNOTIFY;
+  #define END_MEMOTIFY_NAMESPACE      }
+#else
+  #ifndef MEMNOTIFY
+    #define MEMNOTIFY
+    namespace MEMNOTIFY   {}
+  #endif
+  #define BEGIN_MEMNOTIFY_NAMESPACE
+  #define USE_MEMNOTIFY_NAMESPACE
+  #define END_MEMOTIFY_NAMESPACE
+#endif /* if not ENABLE_MEMNOTIFY_NAMESPACE */
 
-#define BEGIN_MEMNOTIFY_NAMESPACE   namespace MEMNOTIFY {
-#define USE_MEMNOTIFY_NAMESPACE     using namespace ::MEMNOTIFY;
-#define END_MEMOTIFY_NAMESPACE      }
 
 BEGIN_MEMNOTIFY_NAMESPACE
 
