@@ -38,7 +38,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 * Class WatcherBuilder.
 * ========================================================================= */
 
-static _BUILDER_INFO* WatcherBuilder :: ourBuilders = NULL;
+WatcherBuilder::_BUILDER_INFO* WatcherBuilder :: ourBuilders = NULL;
 
 Watcher* WatcherBuilder :: build(const QSettings& theData, const QString& theName)
 {
@@ -52,7 +52,7 @@ Watcher* WatcherBuilder :: build(const QSettings& theData, const QString& theNam
       Q_ASSERT(cursor->myType);
       Q_ASSERT(cursor->myFunc);
       if (scanner == cursor->myType)
-        return cursor->myFunc(theName, theData);
+        return cursor->myFunc(theData, theName);
     } /* for */
   }
 

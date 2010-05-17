@@ -63,6 +63,7 @@ class MEMNOTIFY_EXPORT Watcher
     /* That is watcher data for decision making */
     const QString& name() const;        /* Name of this watcher/threshold       */
     const QString& type() const;        /* Type of watcher (debug, cgroups etc) */
+    const QString& sensorPath() const;
 
     /* That is theshold parameters, when we raise the memory change signal */
     Size memoryFree()  const; /* amount of free memory in bytes when should raise trigger */
@@ -130,22 +131,22 @@ inline const QString& Watcher :: type() const
   return myType;
 }
 
-inline const QString& Watcher :: sensor() const
+inline const QString& Watcher :: sensorPath() const
 {
-  return mySensor;
+  return mySensorPath;
 }
 
-inline Size Watcher :: memoryFree()  const
+inline Watcher::Size Watcher :: memoryFree()  const
 {
   return myMemoryFree;
 }
 
-inline Size Watcher :: memoryUsed()  const
+inline Watcher::Size Watcher :: memoryUsed()  const
 {
   return myMemoryUsed;
 }
 
-inline Size Watcher :: memoryLimit() const
+inline Watcher::Size Watcher :: memoryLimit() const
 {
   return myMemoryLimit;
 }
@@ -156,7 +157,7 @@ inline bool Watcher :: enable()
     return true;
 
   myEventsCounter = 0;
-  mySensor = new CachedFile(mySensorPath);
+  mySensor = new CachedFile(mySensorPath.toAscii().constData());
   return (mySensor && mySensor->valid());
 }
 

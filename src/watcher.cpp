@@ -115,7 +115,7 @@ Watcher :: ~Watcher()
       delete mySensor;
 }
 
-Size Watcher :: memoryOption(const QSettings& theData, const char* theKey);
+Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theKey)
 {
   QString opt = option(theData, theKey);
 
@@ -159,9 +159,9 @@ Size Watcher :: memoryOption(const QSettings& theData, const char* theKey);
 void Watcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-    printf ("Watcher %08x: name '%s' type '%s' sensor '%s' free %u used %u total %u handler %d state %d events %u   ",
+    printf ("Watcher %08x: name '%s' type '%s' sensor '%s' free %lu used %lu total %lu handler %d state %d events %u   ",
             (uint)this, myName.toAscii().constData(), myType.toAscii().constData(), mySensorPath.toAscii().constData(),
-            myMemoryFree, myMemoryUsed, myMemoryLimit, myHander, myState, myEventsCounter
+            myMemoryFree, myMemoryUsed, myMemoryLimit, myHandler, myState, myEventsCounter
     );
     if ( mySensor )
       mySensor->dump();

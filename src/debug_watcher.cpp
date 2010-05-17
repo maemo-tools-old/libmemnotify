@@ -128,11 +128,11 @@ bool DebugWatcher :: process()
 
   /* prepare data for handling */
   char buf[BUFSIZ];
-  ssize_t loaded = read(myHandle, buf, sizeof(buf));
-  const uint char* cursor = (const uint char*)buf;
+  ssize_t loaded = read(myHandler, buf, sizeof(buf));
+  const unsigned char* cursor = (const unsigned char*)buf;
   uint handled = 0;
 
-  while (loaded >= sizeof(struct inotify_event))
+  while (loaded >= (ssize_t) sizeof(struct inotify_event))
   {
     const struct inotify_event* ep = (const struct inotify_event*)cursor;
     const ssize_t es = sizeof(*ep) + ep->len;

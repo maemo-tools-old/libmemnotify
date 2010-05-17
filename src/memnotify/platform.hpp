@@ -34,6 +34,7 @@
 
 #include <sys/sysinfo.h>
 #include <time.h>
+#include <stdlib.h>
 
 #include <memnotify/definitions.hpp>
 
@@ -44,7 +45,6 @@ BEGIN_MEMNOTIFY_NAMESPACE
  * Classes.
  * ========================================================================= */
 
-
 /*!
   \class Platform
   \relates <memnotify/platform.hpp>
@@ -54,9 +54,9 @@ BEGIN_MEMNOTIFY_NAMESPACE
 class MEMNOTIFY_EXPORT Platform
 {
   public:
-
     /* Units to report sizes of memory */
     typedef uint long Size;
+
 
     /* Representation of options passed in MEMNOTIFY_ENV_NAME environement variable. Expected be short (below 10 items) */
     typedef QPair<QString,QString> Option;
@@ -67,8 +67,8 @@ class MEMNOTIFY_EXPORT Platform
     {
       public:
 
-        SystemMemory();
-        ~SystemMemory();
+        SystemMemory() : myActual(0) { refresh();}
+        ~SystemMemory() {}
 
         Size ram()   const;
         Size swap()  const;
@@ -133,7 +133,7 @@ class MEMNOTIFY_EXPORT Platform
 
     /* Shared data for singletone object */
     static Platform* ourPlatform;
-} /* Class Platform */
+}; /* Class Platform */
 
 /* ========================================================================= *
  * Inline methods for Platform::SystemMemory.
@@ -150,37 +150,28 @@ inline void Platform::SystemMemory :: refresh()
   }
 } /* refresh */
 
-
-inline Platform::SystemMemory() : myActual(0)
-{
-  refresh();
-}
-
-inline Platform::~SystemMemory()
-{}
-
-inline Size Platform::SystemMemory :: ram() const
+inline Platform::Size Platform::SystemMemory :: ram() const
 {
   return (mySysinfo.totalram + mySysinfo.totalhigh) * mySysinfo.mem_unit;
 }
 
-inline Size Platform::SystemMemory :: swap() const
+inline Platform::Size Platform::SystemMemory :: swap() const
 {
   return mySysinfo.totalswap * mySysinfo.mem_unit;
 }
 
-inline Size Platform::SystemMemory :: total() const
+inline Platform::Size Platform::SystemMemory :: total() const
 {
   return ram() + swap();
 }
 
-inline Size Platform::SystemMemory :: free()
+inline Platform::Size Platform::SystemMemory :: free()
 {
   refresh();
   return (mySysinfo.freeram + mySysinfo.bufferram + mySysinfo.freeswap + mySysinfo.freehigh) * mySysinfo.mem_unit;
 }
 
-inline Size Platform::SystemMemory :: used()
+inline Platform::Size Platform::SystemMemory :: used()
 {
   return (total() - free());
 }
@@ -230,7 +221,7 @@ inline const char* Platform :: option(const char* name) const
 {
   if (name && *name && myOptions.size() > 0)
   {
-    const index = myOptions.indexOf( Option(name,QString()) );
+    const int index = myOptions.indexOf( Option(name,QString()) );
     if (index >= 0)
       return myOptions.at(index).second.toAscii().constData();
   }

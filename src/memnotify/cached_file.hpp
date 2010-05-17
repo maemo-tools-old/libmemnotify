@@ -101,7 +101,7 @@ inline bool CachedFile :: load()
       /* failed to load time - read to memory */
       return readToMemory();
     }
-    else if (((now.tv_sec - myActual.tv_sec) * 1000000 + now.tv_usec - myActual.tv_usec) >= myUpdate)
+    else if ( uint((now.tv_sec - myActual.tv_sec) * 1000000 + now.tv_usec - myActual.tv_usec) >= myUpdate)
     {
       if ( !readToMemory() )
         return false;

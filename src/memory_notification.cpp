@@ -41,7 +41,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 * Class MemoryNotification.
 * ========================================================================= */
 
-static MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
+MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
 
 
 bool MemoryNotification :: setup(const char* pathSpecification)
@@ -64,13 +64,11 @@ bool MemoryNotification :: setup(const char* pathSpecification)
     const QSettings   config(file, QSettings::IniFormat);
     /* array with names of thresholds */
     const QStringList tholds(config.childGroups());
-    /* array with data to create watchers */
-    const QStringList data(config.allKeys());
 
     /* Now trying to build the watchers, one by one */
     foreach(QString thold, tholds)
     {
-      Watcher* newcomer = WatcherBuilder::build(data, thold);
+      Watcher* newcomer = WatcherBuilder::build(config, thold);
       Q_ASSERT(NULL != newcomer);
 #if MEMNOTIFY_DUMP
       Q_ASSERT(true == newcomer->valid());
@@ -102,8 +100,8 @@ bool MemoryNotification :: poll()
   }
 
   /* collect the handlers */
-  int  handlers[ myWatchers->count() ];
-  const uint counter = query(handlers, myWatchers->count());
+  int  handlers[ myWatchers.count() ];
+  const uint counter = query(handlers, myWatchers.count());
 
   if ( !counter )
     return false;
@@ -116,7 +114,7 @@ bool MemoryNotification :: poll()
 uint MemoryNotification :: query(int* fds, uint size)
 {
   uint counter = 0;
-  if (myEnabled && fd && myWatchers->count() <= (int)size)
+  if (myEnabled && fds && myWatchers.count() <= (int)size)
   {
     foreach(const Watcher* watcher, myWatchers)
     {
@@ -133,11 +131,11 @@ uint MemoryNotification :: query(int* fds, uint size)
 bool MemoryNotification :: process(const int* fds, uint counter)
 {
   /* we should be enabled */
-  if ( !myEnable )
+  if ( !myEnabled )
     return false;
 
   /* Check the parameters */
-  if ( !fd )
+  if ( !fds )
     return false;
 
   if ( !counter )
@@ -153,7 +151,7 @@ bool MemoryNotification :: process(const int* fds, uint counter)
     const int fd = fds[ifd];
 
     /* First - we should find the watcher */
-    foreach(Watcher* cursor, myWatchers)
+    foreach(Watcher* watcher, myWatchers)
     {
       Q_ASSERT(NULL != watcher);
       if (watcher && fd == watcher->handler())
@@ -222,7 +220,7 @@ bool MemoryNotification :: enable()
   }
 
   /* set common enabled flag on only if we have all items enabled */
-  myEnabled = (myWatchers->count() == enabled_counter);
+  myEnabled = (myWatchers.count() == enabled_counter);
 
   /* function done if no items enabled */
   return (myEnabled);
@@ -253,7 +251,7 @@ bool MemoryNotification :: disable()
   }
 
   /* set common enabled flag off only if we have all items disabled */
-  myEnabled = (myWatchers->count() != disabled_counter);
+  myEnabled = (myWatchers.count() != disabled_counter);
 
   /* function done if no items enabled */
   return (! myEnabled);
@@ -300,7 +298,7 @@ void MemoryNotification :: clearWatchers()
   }
 } /* clearWatchers */
 
-void MemoryNotification :: dump()
+void MemoryNotification :: dump() const
 {
 #if MEMNOTIFY_DUMP
   printf ("MemoryNotification %08x {\n", (uint)this);
@@ -312,14 +310,14 @@ void MemoryNotification :: dump()
     printf ("  polling is running: %d\n", myPoller->isRunning());
 
   printf ("  observers %d {\n", myObservers.count());
-  for (const OBSERVER observer, myObservers)
+  foreach (OBSERVER observer, myObservers)
   {
     printf ("\t%08x\n", (uint)observer);
   }
   printf ("  }\n");
 
   printf ("  watchers %d {\n", myWatchers.count());
-  for (const Watchers watcher, myWatchers)
+  foreach (Watcher* watcher, myWatchers)
   {
     printf ("\t%08x ", (uint)watcher);
     if (watcher)

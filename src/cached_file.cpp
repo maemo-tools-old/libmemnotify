@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <memnotify/platform.hpp>
 #include <memnotify/cached_file.hpp>
 
@@ -40,20 +41,21 @@ BEGIN_MEMNOTIFY_NAMESPACE
 * ========================================================================= */
 
 CachedFile :: CachedFile(const char* sPath, const uint msUpdateInteval)
-  : myPath(NULL), myHandler(-1), myText(NULL), myActual(0,0), myUpdate(msUpdateInteval * 1000)
+  : myPath(NULL), myHandler(-1), myText(NULL), myUpdate(msUpdateInteval * 1000)
 {
   char buf[PATH_MAX];
 
+  memset(&myActual, 0, sizeof(myActual));
   if ( Platform::defaultObject().path(sPath, buf, sizeof(buf)) )
   {
     myPath    = strdup(buf);
-    myHanlder = open(myPath, O_RDONLY|O_DIRECT|O_NOATIME);
+    myHandler = open(myPath, O_RDONLY|O_DIRECT|O_NOATIME);
   }
 } /* CachedFile */
 
 CachedFile :: ~CachedFile()
 {
-  if (myHander >= 0)
+  if (myHandler >= 0)
     close(myHandler);
 
   if (myText)
@@ -105,7 +107,7 @@ void CachedFile :: dump() const
 {
 #if MEMNOTIFY_DUMP
   printf ("CachedFile %08x: path '%s' hander %d actual %u.%06u update %u text '%s'\n",
-          (uint)this, myPath, myHander, myActual.tv_sec, myActual.tv_usec, myUpdate, myText
+          (uint)this, myPath, myHandler, myActual.tv_sec, myActual.tv_usec, myUpdate, myText
     );
 #endif /* if MEMNOTIFY_DUMP */
 }

@@ -98,7 +98,7 @@ bool CgroupsWatcher :: enable()
 
         if ( cfd >= 0 )
         {
-          const bool succ = (dprintf(cfd, "%d %d %u", efd, mySensor->handler(), myMemoryUsed) > 0);
+          const bool succ = (dprintf(cfd, "%d %d %u", efd, mySensor->handler(), (uint)myMemoryUsed) > 0);
           close(cfd);
           if ( succ )
           {
@@ -147,11 +147,11 @@ bool CgroupsWatcher :: process()
 
   /* prepare data for handling */
   char buf[BUFSIZ];
-  ssize_t loaded = read(myHandle, buf, sizeof(buf));
+  ssize_t loaded = read(myHandler, buf, sizeof(buf));
   const quint64* cursor = (const quint64*)buf;
   uint handled = 0;
 
-  while (loaded >= sizeof(*cursor))
+  while (loaded >= (ssize_t) sizeof(*cursor))
   {
 #if MEMNOTIFY_DUMP
     printf ("=> %s: watcher %08x eventfd handler %d evendfd %016llx\n",

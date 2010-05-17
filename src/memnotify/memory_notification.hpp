@@ -206,14 +206,14 @@ inline uint MemoryNotification :: eventsCounter() const
 inline void MemoryNotification :: connectNotify(const char* signal)
 {
     mySignalCounter++;
-    QObject::connectNotify();
+    QObject::connectNotify(signal);
 }
 
 inline void MemoryNotification :: disconnectNotify(const char* signal)
 {
   if (mySignalCounter > 0)
     mySignalCounter--;
-  QObject::disconnectNotify();
+  QObject::disconnectNotify(signal);
 }
 
 inline MemoryNotification* MemoryNotification :: create(const char* pathSpecification)

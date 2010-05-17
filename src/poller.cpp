@@ -35,7 +35,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 * Class Poller.
 * ========================================================================= */
 
-Poller :: Poller(const QObject* notification, const int* handlers, const uint counter)
+Poller :: Poller(QObject* notification, const int* handlers, const uint counter)
   : QThread(notification), myHandlers(NULL), myCounter((const nfds_t)counter)
 {
   if (handlers && counter)
@@ -93,7 +93,7 @@ void Poller :: run()
       return;
 
     if ( !reinterpret_cast<MemoryNotification*>(parent())->process(incoming, iput) )
-      return false;
+      return;
   } /* forever */
 } /* run */
 

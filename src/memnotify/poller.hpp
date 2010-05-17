@@ -42,12 +42,12 @@ BEGIN_MEMNOTIFY_NAMESPACE
  *  updates will come rarely - so poll() was used for now.
  * ========================================================================= */
 
-class MEMNOTIFY_PRIVATE Poller
+class MEMNOTIFY_PRIVATE Poller: public QThread
 {
 
   public:
 
-    Poller(const QObject* notification, const int* handlers, const uint counter);
+    Poller(QObject* notification, const int* handlers, const uint counter);
     ~Poller();
 
   protected:

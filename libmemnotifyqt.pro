@@ -3,7 +3,7 @@ TEMPLATE = subdirs
 SUBDIRS = \
           doc \
           src \
-          tests
+#          test
 
 CONFIG += ordered
 

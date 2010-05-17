@@ -29,6 +29,8 @@
 * Includes.
 * ========================================================================= */
 
+#include <fcntl.h>
+
 #include <QString>
 #include <QSettings>
 #include <memnotify/definitions.hpp>
@@ -65,24 +67,25 @@ class MEMNOTIFY_EXPORT WatcherBuilder
   public:
 
     /* The callback to make a builder by request */
-    typedef Watcher* (_BUILDER_FUNC)(const QString&, const QSettings&);
+    typedef Watcher* (*_BUILDER_FUNC)(const QSettings&, const QString&);
+
 
     /* Structure to create record about how to construct builder */
-    typedef struct
+    struct _BUILDER_INFO
     {
       const char*     myType;   /* name of controller type discovered in settings */
       _BUILDER_FUNC   myFunc;   /* function to construct controller               */
-      _BUILDER_INFO   mySucc;   /* the next entry in list                         */
-    } _BUILDER_INFO;
+      _BUILDER_INFO*  mySucc;   /* the next entry in list                         */
+    };
 
 
     /* Internal class which is used to register builder from constructor */
-    templace <class W>
+    template <class W>
     class Announcer
     {
       public:
 
-        inline Announcher(const char* typeName)
+        inline Announcer(const char* typeName)
         {
           static _BUILDER_INFO info = {typeName, (_BUILDER_FUNC)build, NULL };
           WatcherBuilder::announce(&info);

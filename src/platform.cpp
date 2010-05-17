@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <QStringList>
 #include <memnotify/platform.hpp>
 #include <memnotify/cached_file.hpp>
 
@@ -43,11 +44,11 @@ BEGIN_MEMNOTIFY_NAMESPACE
 void Platform::SystemMemory :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("Platform::SystemMemory %08x { actual %u uptime %ld memory unit %u\n"
+  printf ("Platform::SystemMemory %08x { actual %u uptime %ld memory unit %u\n",
       (uint)this, (uint)myActual, mySysinfo.uptime, mySysinfo.mem_unit
     );
 
-  printf ("   ram: total %u free %u shared %u buffer %u; swap: total %u free %u; high: total %u free %u\n}\n"
+  printf ("   ram: total %lu free %lu shared %lu buffer %lu; swap: total %lu free %lu; high: total %lu free %lu\n}\n",
       mySysinfo.totalram, mySysinfo.freeram, mySysinfo.sharedram, mySysinfo.bufferram,
       mySysinfo.totalswap, mySysinfo.freeswap, mySysinfo.totalhigh, mySysinfo.freehigh
     );
@@ -58,7 +59,7 @@ void Platform::SystemMemory :: dump() const
  * Class Platform.
  * ========================================================================= */
 
-static Platform* Platform :: ourPlatform = NULL;
+Platform* Platform :: ourPlatform = NULL;
 
 
 bool Platform :: parseOptions()
@@ -145,7 +146,7 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
   else if (0 == strncmp(cgroup, name, sizeof(cgroup)-1))
   {
     /* replacing cgroup:/somefile to /syspart/current_group_path/somefile */
-    const char* current_group = strrchr(cgroup(), ':');
+    const char* current_group = strrchr(this->cgroup(), ':');
     if ( current_group )
       current_group++;
     else
