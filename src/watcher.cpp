@@ -115,7 +115,7 @@ Watcher :: ~Watcher()
       delete mySensor;
 }
 
-Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theKey)
+Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theKey) const
 {
   QString opt = option(theData, theKey);
 

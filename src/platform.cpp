@@ -116,7 +116,7 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
   if (!buffer || !size)
     return false;
 
-  const char cgroup[] = "cgroup:";
+  const char cgStr[] = "cgroup:";
   const uint nlen = strlen(name);
   const uint clen = sizeof(MEMNOTIFY_CONF_PATH) - 1;
 
@@ -143,16 +143,16 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
     memcpy(buffer + hlen, name, nlen);
     buffer[nlen + hlen] = 0;
   }
-  else if (0 == strncmp(cgroup, name, sizeof(cgroup)-1))
+  else if (0 == strncmp(cgStr, name, sizeof(cgStr)-1))
   {
     /* replacing cgroup:/somefile to /syspart/current_group_path/somefile */
-    const char* current_group = strrchr(this->cgroup(), ':');
+    const char* current_group = strrchr(cgroup(), ':');
     if ( current_group )
       current_group++;
     else
       return false;
 
-    const int rc = snprintf(buffer, size, "%s%s%s", syspart(), current_group, name + sizeof(cgroup) - 1);
+    const int rc = snprintf(buffer, size, "%s%s%s", syspart(), current_group, name + sizeof(cgStr) - 1);
     return (rc > 0 && (uint)rc < size && 0 == access(buffer, R_OK));
   }
   else
@@ -186,7 +186,7 @@ const char* Platform :: cgroup() const
 void Platform :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("Platform %08x { mySyspart '%s' ",
+  printf ("Platform %08x { syspart '%s' ",
           (uint)this, mySyspart
     );
 

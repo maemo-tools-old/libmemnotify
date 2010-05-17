@@ -317,7 +317,7 @@ void MemoryNotification :: dump() const
   printf ("  }\n");
 
   printf ("  watchers %d {\n", myWatchers.count());
-  foreach (Watcher* watcher, myWatchers)
+  foreach (const Watcher* watcher, myWatchers)
   {
     printf ("\t%08x ", (uint)watcher);
     if (watcher)

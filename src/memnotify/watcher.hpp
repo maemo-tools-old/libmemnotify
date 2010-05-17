@@ -112,7 +112,7 @@ class MEMNOTIFY_EXPORT Watcher
   protected:
 
     QString option(const QSettings& theData, const char* theKey, const QVariant& theDefVal = QVariant()) const;
-    Size    memoryOption(const QSettings& theData, const char* theKey);
+    Size    memoryOption(const QSettings& theData, const char* theKey) const;
     bool    percents(Size memoryOptionValue);
 
 }; /* Class Watcher */
