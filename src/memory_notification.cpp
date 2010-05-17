@@ -46,8 +46,6 @@ static MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
 
 bool MemoryNotification :: setup(const char* pathSpecification)
 {
-  const bool wasEnabled = myEnabled;
-
   /* We should disable functionality if it is enabled */
   if (myEnabled && !disable())
     return false;
@@ -83,22 +81,41 @@ bool MemoryNotification :: setup(const char* pathSpecification)
   } /* for each file */
 
   /* As a result we must have at least one watcher created */
-  if ( myWatchers.isEmpty() )
-    return false;
-
-  /* We should enable functionality back if it was enabled */
-  return (!wasEnabled || enable());
+  return !myWatchers.isEmpty();
 } /* setup */
 
 bool MemoryNotification :: poll()
 {
-  /* FIXME: QThread-based solution for epoll expected. AIO doesn't work as necessary */
-  return false;
+  /* trying to enable first if not enabled */
+  if (!myEnabled && !enable())
+    return false;
+
+  /* that is strange but possible */
+  if ( myPoller )
+  {
+    if ( myPoller->isRunning() )
+      return true;
+    /* poller needs to be re-created */
+    myPoller->terminate();
+    delete myPoller;
+    myPoller = NULL;
+  }
+
+  /* collect the handlers */
+  int  handlers[ myWatchers->count() ];
+  const uint counter = query(handlers, myWatchers->count());
+
+  if ( !counter )
+    return false;
+
+  /* Now construct the poller object */
+  myPoller = new Poller(this, handlers, counter);
+  return myPoller->isRunning();
 } /* poll */
 
 uint MemoryNotification :: query(int* fds, uint size)
 {
-  uint index = 0;
+  uint counter = 0;
   if (myEnabled && fd && myWatchers->count() <= (int)size)
   {
     foreach(const Watcher* watcher, myWatchers)
@@ -106,11 +123,11 @@ uint MemoryNotification :: query(int* fds, uint size)
       const int handler = (watcher ? watcher->handler() : -1);
       if ( handler < 0 )
         return 0;
-      fds[index++] = handler;
+      fds[counter++] = handler;
     }
   }
 
-  return index;
+  return counter;
 } /* query */
 
 bool MemoryNotification :: process(const int* fds, uint counter)
@@ -227,6 +244,14 @@ bool MemoryNotification :: disable()
     }
   }
 
+  /* if poller is running - remove it. Likely thread will finished already */
+  if ( myPoller )
+  {
+    myPoller->terminate();
+    delete myPoller;
+    myPoller = NULL;
+  }
+
   /* set common enabled flag off only if we have all items disabled */
   myEnabled = (myWatchers->count() != disabled_counter);
 
@@ -279,9 +304,12 @@ void MemoryNotification :: dump()
 {
 #if MEMNOTIFY_DUMP
   printf ("MemoryNotification %08x {\n", (uint)this);
-  printf ("  outMemoryNotification %08x signal counter %u enabled %d poll thread %08x\n",
-          (uint)ourMemoryNotification, mySignalCounter, myEnabled, (uint)myThread
+  printf ("  outMemoryNotification %08x signal counter %u enabled %d polling thread %08x\n",
+          (uint)ourMemoryNotification, mySignalCounter, myEnabled, (uint)myPoller
       );
+
+  if ( myPoller )
+    printf ("  polling is running: %d\n", myPoller->isRunning());
 
   printf ("  observers %d {\n", myObservers.count());
   for (const OBSERVER observer, myObservers)
@@ -301,8 +329,6 @@ void MemoryNotification :: dump()
   }
   printf ("  }\n");
 
-  if ( myThread )
-    ((const PollThread*)myThread)->dump();
 
   printf ("}\n");
 #endif /* if MEMNOTIFY_DUMP */
