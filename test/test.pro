@@ -1,10 +1,10 @@
 TEMPLATE      = subdirs
 SUBDIRS       = \
 	cached_file  \
-	memory_notification \
 	platform \
-	watcher_builder 
+	watcher_builder \
+	memory_notification \
 
 # install
-INSTALLS += target 
+#INSTALLS += target 
 

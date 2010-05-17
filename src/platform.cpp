@@ -164,7 +164,7 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
   }
 
   /* Verify extension */
-  if (NULL == strrchr(buffer, '.'))
+  if (NULL == strrchr(buffer, '.') && access(buffer, R_OK))
   {
     strcat(buffer, ".mn");
   }

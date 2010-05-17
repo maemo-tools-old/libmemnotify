@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <memnotify/cached_file.hpp>
 
@@ -39,7 +40,7 @@
 
 int main(const int argc, const char* argv[])
 {
-  MEMNOTIFY::CachedFile cf("/proc/stat", 1000);
+  MEMNOTIFY::CachedFile cf( (argc > 1 && argv[1] ? argv[1] : "/proc/stat"), 1000);
 
   cf.dump();
   printf ("cf.valid = %d\n", cf.valid());
@@ -52,7 +53,7 @@ int main(const int argc, const char* argv[])
       printf ("=> load: FAILURE\n");
 
     cf.dump();
-    usleep(1000);
+    usleep(1000000);
   }
 
   return 0;

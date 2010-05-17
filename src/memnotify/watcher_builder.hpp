@@ -52,7 +52,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
     ANNOUNCE_WATCHER(CgroupsWatcher, cgroups_control);
     ANNOUNCE_WATCHER(CgroupsWatcher, cgroups);
 */
-#define ANNOUNCE_WATCHER(W,N)    static const WatcherBuilder::Announcer<W> announce ## W ## N (#N)
+#define ANNOUNCE_WATCHER(W,N)    static const WatcherBuilder::Announcer<W,__LINE__> announce ## W ## N (#N)
 
 
 /*!
@@ -79,8 +79,10 @@ class MEMNOTIFY_EXPORT WatcherBuilder
     };
 
 
-    /* Internal class which is used to register builder from constructor */
-    template <class W>
+    /* Internal class which is used to register builder from constructor     */
+    /* The integer ID part as line number added to prevent re-using the      */
+    /* same template instance for aliaces which might be several in one file */
+    template <class W, int L>
     class Announcer
     {
       public:

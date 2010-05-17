@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <QCoreApplication>
 #include <memnotify/memory_notification.hpp>
 
 
@@ -37,19 +38,13 @@
  * Very simple test application
  * ========================================================================= */
 
-static void myListener(const QString& name, const bool state)
+static void listenerObserver(const QString& name, const bool state)
 {
   printf ("CALLBACK: memory signal %s delivered in state %d\n", name.toAscii().constData(), state);
 }
 
-class clListener: public QObject
+class Listener: public QObject
 {
-  public:
-    Q_OBJECT
-
-    clListener(QObject* parent): QObject(parent)
-    {}
-
   public slots:
 
     inline void notified(const QString& name, const bool state)
@@ -59,30 +54,57 @@ class clListener: public QObject
     }
 };
 
-int main(const int argc, char* argv[])
+class TestApp: public QCoreApplication
 {
-  printf ("sanity testing MemoryNotification\n");
-  QCoreApplication app(argc, argv);
+  public:
 
-  MEMNOTIFY::MemoryNotification* notification = MEMNOTIFY::MemoryNotification::defaultObject();
-  if ( !notification )
+    TestApp(int argc, char* argv[]);
+    ~TestApp();
+
+  protected:
+
+    Listener  myListener;
+    MEMNOTIFY::MemoryNotification& myNotification;
+};
+
+
+TestApp::TestApp(int argc, char* argv[]): QCoreApplication(argc, argv), myListener(), myNotification(MEMNOTIFY::MemoryNotification::defaultObject())
+{
+  if ( NULL == (&myNotification) )
   {
     printf ("nulled notification\n");
-    return 1;
+    exit(1);
   }
 
-  if ( !notification->addObserver(myListener) )
+  if ( !myNotification.addObserver(listenerObserver) )
   {
-    printf ("addObserver failed\n");
-    return 1;
+    printf ("addObserver(%08x) failed\n", (uint)listenerObserver);
+    exit(1);
   }
 
-  clListener listener(app);
-  connect(notification, SIGNAL(notified(const QString&, const bool)), &listener, SLOT(notified(const QString&, const bool)));
+  connect(&myNotification, SIGNAL(notified(const QString&, const bool)), &myListener, SLOT(notified(const QString&, const bool)));
+  myNotification.dump();
 
-  notification->dump();
+  if ( !myNotification.valid() )
+  {
+    printf ("MemoryNotification is not valid\n");
+    exit(1);
+  }
+}
 
-  return QCoreApplication::exec();
+TestApp::~TestApp()
+{
+  printf ("before destroying MemoryNotification::defaultObject()\n");
+  delete &myNotification;
+  printf ("after destroying MemoryNotification::defaultObject()\n");
+}
+
+int main(int argc, char* argv[])
+{
+  printf ("sanity testing MemoryNotification\n");
+  TestApp app(argc, argv);
+
+  return app.exec();
 } /* main */
 
 /* =================[ end of file memnotify/test-watcher_builder.cpp ]====================== */

@@ -49,7 +49,7 @@ CachedFile :: CachedFile(const char* sPath, const uint msUpdateInteval)
   if ( Platform::defaultObject().path(sPath, buf, sizeof(buf)) )
   {
     myPath    = strdup(buf);
-    myHandler = open(myPath, O_RDONLY|O_DIRECT|O_NOATIME);
+    myHandler = open(myPath, O_RDONLY|O_NOATIME);
   }
 } /* CachedFile */
 
