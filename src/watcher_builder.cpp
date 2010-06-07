@@ -42,6 +42,11 @@ WatcherBuilder::_BUILDER_INFO* WatcherBuilder :: ourBuilders = NULL;
 
 Watcher* WatcherBuilder :: build(const QSettings& theData, const QString& theName)
 {
+  /* Is this watcher disabled? */
+  if ( theData.value(theName + "/disabled", false).toBool() )
+    return NULL;
+
+  /* Watcher is enabled - trying to construct */
   const QString scanner( theData.value(theName + "/type").toString() );
 
   /* Make a lookup only if controller type name looks sane */

@@ -61,6 +61,7 @@ You can point such files in constructor path, thresholds with the same names wil
 Overall control file structure is the following:
   [Memory Signal Name]
   type=type_of_controller
+  disabled=true|false
   sensor=file path to sensor
   limit=value or path to limit file
   free=value k|m|%
@@ -68,6 +69,7 @@ Overall control file structure is the following:
 
 Details for each parameter:
   type    - now cgroups_control and debug can be used
+  disabled- optional parameter to disable pointed watcher
   sensor - path to file which should be used to tracking current memory usage
   limit  - could be a value or path to file which contains limiting value, required only for "free" kind thresholds
   free   - amount of free memory (limit vs. sensor) in kilobytes, megabytes or percents to be raised
@@ -148,7 +150,7 @@ MEMNOTIFY::WatcherBuilder -- makes a controller based on description "type=" and
 
 file platform
 MEMNOTIFY::Platform -- platform parameters and settings
-- MEMNOTIFY env variable with settings
+- MEMNOTIFY env variable with settings (see environment.txt for additional information)
 - total, free and used memory
 - location of /syspart
 - TBD

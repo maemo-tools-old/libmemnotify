@@ -1,0 +1,22 @@
+Environment variable settings
+=============================
+
+The MEMNOTIFY environment variable can be used to control over run-time behaviour of linked libmemnotifyqt.
+Name of environment variable is specified as MEMNOTIFY_ENV_NAME (see definitions.hpp) and set for current version
+to MEMNOTIFY. The following format is accepted and handled by MEMNOTIFY::Platform class:
+
+The accepted format of MEMNOTIFY contents:
+  option_name[=option_value]{:option_name[=option_value]}
+
+The example of usage:
+  MEMNOTIFY="cgroups_mount_point=/mysyspart" ./MyApp
+
+
+Currently supported options
+---------------------------
+
+Option name         Default   Comment
+disabled              0       by default feature enabled. Disabling means no watchers will be created and signals generated.
+cgroups_mount_point /syspart  where cgroups mounting point is located (to eliminate dependency to /proc/mount)
+
+

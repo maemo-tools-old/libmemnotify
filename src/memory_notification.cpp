@@ -68,12 +68,15 @@ bool MemoryNotification :: setup(const char* pathSpecification)
     foreach(QString thold, tholds)
     {
       Watcher* newcomer = WatcherBuilder::build(config, thold);
-      Q_ASSERT(NULL != newcomer);
-#if MEMNOTIFY_DUMP
-      Q_ASSERT(true == newcomer->valid());
-#endif
+
+      /* Watcher might be disabled in configuration file */
       if ( newcomer )
+      {
+#if MEMNOTIFY_DUMP
+        Q_ASSERT(true == newcomer->valid());
+#endif
         myWatchers.append(newcomer);
+      }
     } /* for each thold */
   } /* for each file */
 

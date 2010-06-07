@@ -26,6 +26,7 @@
 * Includes.
 * ========================================================================= */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -86,9 +87,35 @@ bool Platform :: parseOptions()
   return false;
 } /* parseOptions */
 
+
 bool Platform :: syspart(const char* str)
 {
-  if (str && *str && 0 == access(str, F_OK))
+  static char* mountpath = NULL;
+
+  /* If nothing passed we will get path from /proc/mounts file */
+  if (!str || !*str)
+  {
+    if (!mountpath)
+    {
+      static const char fsType[] = "cgroup";
+      CachedFile mounts("/proc/mounts");
+      char* pos;
+
+      if (mounts.load() && NULL != (pos = strstr(mounts.text(), fsType)))
+      {
+        uint index = 0;
+
+        pos += sizeof(fsType);
+        while (pos[index] &&  !isspace(pos[index]))
+          index++;
+        pos[index] = 0;
+        mountpath = strdup(pos);
+      }
+    }
+    str = mountpath;
+  }
+
+  if (0 == access(str, F_OK))
   {
     if (mySyspart)
       free(mySyspart);
@@ -100,6 +127,7 @@ bool Platform :: syspart(const char* str)
     return false;
   }
 }  /* syspart */
+
 
 bool Platform :: path(const char* name, char* buffer, uint size) const
 {
