@@ -97,25 +97,36 @@ bool Platform :: syspart(const char* str)
   {
     if (!mountpath)
     {
-      static const char fsType[] = "cgroup";
-      CachedFile mounts("/proc/mounts");
-      char* pos;
-
-      if (mounts.load() && NULL != (pos = strstr(mounts.text(), fsType)))
+      /* load line with cgroups, CachedFile usage is prohibited there */
+      FILE* fp = fopen("/proc/mounts", "r");
+      if ( fp )
       {
-        uint index = 0;
+        static const char fsType[] = "cgroup";
+        char buf[BUFSIZ];
+        char* pos = NULL;
 
-        pos += sizeof(fsType);
-        while (pos[index] &&  !isspace(pos[index]))
-          index++;
-        pos[index] = 0;
-        mountpath = strdup(pos);
+        while (NULL == pos && fgets(buf, sizeof(buf), fp))
+        {
+          pos = strstr(buf, fsType);
+        }
+        fclose(fp);
+
+        if (pos && *pos)
+        {
+          uint index = 0;
+
+          pos += sizeof(fsType);
+          while (pos[index] &&  !isspace(pos[index]))
+            index++;
+          pos[index] = 0;
+          mountpath = strdup(pos);
+        }
       }
     }
     str = mountpath;
   }
 
-  if (0 == access(str, F_OK))
+  if (str && *str && 0 == access(str, F_OK))
   {
     if (mySyspart)
       free(mySyspart);
@@ -215,7 +226,7 @@ void Platform :: dump() const
 {
 #if MEMNOTIFY_DUMP
   printf ("Platform %08x { syspart '%s' ",
-          (uint)this, mySyspart
+          (uint)this, (mySyspart ? mySyspart : "")
     );
 
   printf ("options %08x = [", (uint)(&myOptions));
