@@ -9,14 +9,13 @@ The accepted format of MEMNOTIFY contents:
   option_name[=option_value]{:option_name[=option_value]}
 
 The example of usage:
-  MEMNOTIFY="cgroups_mount_point=/mysyspart" ./MyApp
+  MEMNOTIFY="config=/etc/myconfig:cgroups_mount_point=/mysyspart" ./MyApp
 
 
 Currently supported options
 ---------------------------
 
-Option name         Default   Comment
-disabled              0       by default feature enabled. Disabling means no watchers will be created and signals generated.
-cgroups_mount_point /syspart  where cgroups mounting point is located (to eliminate dependency to /proc/mount)
-
-
+Option name         Default         Comment
+disabled              0             by default feature enabled. Disabling means no watchers will be created and signals generated.
+config              /etc/memnotify  where configuration files located by default
+cgroups_mount_point /syspart        where cgroups mounting point is located (to eliminate dependency to /proc/mount)

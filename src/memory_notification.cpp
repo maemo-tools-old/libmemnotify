@@ -73,6 +73,7 @@ bool MemoryNotification :: setup(const char* pathSpecification)
       if ( newcomer )
       {
 #if MEMNOTIFY_DUMP
+newcomer->dump();
         Q_ASSERT(true == newcomer->valid());
 #endif
         myWatchers.append(newcomer);

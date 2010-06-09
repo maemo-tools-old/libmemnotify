@@ -105,8 +105,8 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
     /* Returns object only in case all files are loaded properly                    */
     static MemoryNotification* create(const char* pathSpecification=NULL);
 
-    /* Created singletone and loaded only default file "default.mn" */
-    static MemoryNotification& defaultObject();
+    /* Created singletone and loaded default or or pointed file(s) */
+    static MemoryNotification& defaultObject(const char* pathSpecification=NULL);
 
   protected:
 
@@ -231,14 +231,14 @@ inline MemoryNotification* MemoryNotification :: create(const char* pathSpecific
   return NULL;
 } /* create */
 
-inline MemoryNotification& MemoryNotification :: defaultObject()
+inline MemoryNotification& MemoryNotification :: defaultObject(const char* pathSpecification)
 {
   if ( !ourMemoryNotification )
   {
     ourMemoryNotification = new MemoryNotification();
     Q_ASSERT(ourMemoryNotification != NULL);
     if (ourMemoryNotification)
-      ourMemoryNotification->setup(NULL);
+      ourMemoryNotification->setup(pathSpecification);
   }
 
   return (*ourMemoryNotification);

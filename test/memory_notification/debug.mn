@@ -1,0 +1,29 @@
+[Memory Level 20%]
+type=debug
+sensor=./sensor.txt
+limit=100M
+used=20%
+
+[Memory Level 40%]
+type=debug
+sensor=./sensor.txt
+limit=100M
+used=40%
+
+[Memory Level 60%]
+type=debug
+sensor=./sensor.txt
+limit=100M
+used=60%
+
+[Yellow usage]
+type=debug
+sensor=./sensor.txt
+limit=100M
+used=80%
+
+[Red usage]
+type=debug
+sensor=./sensor.txt
+limit=100M
+used=90M

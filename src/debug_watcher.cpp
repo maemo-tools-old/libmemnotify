@@ -177,6 +177,7 @@ bool DebugWatcher :: valid() const
 {
   if ( Watcher::valid() )
   {
+printf ("Watcher::valid()\n");
     return (mySensor ? mySensor->valid() && myHandler >= 0 && myWatcher >= 0 : myHandler < 0 && myWatcher < 0);
   }
   return false;

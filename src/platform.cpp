@@ -145,7 +145,7 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
   /*
     Files could be located:
     - /etc/memnotify folder as a system-wide specification, accessible as "platform.mn"
-    - $HOME folder - as user-only specification, accessible as "./quake3/memory.mn"
+    - $HOME folder - as user-only specification, accessible as "~/quake3/memory.mn"
     - some path which you like, e.g. "/etc/defaults/quake.mn"
     - cgroup:/name_in_cgroup - in current process cgroup
   */
@@ -157,19 +157,24 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
 
   const char cgStr[] = "cgroup:";
   const uint nlen = strlen(name);
-  const uint clen = sizeof(MEMNOTIFY_CONF_PATH) - 1;
+
+  /* Check configuration path files location */
+  const char* cpath = option("config");
+  if (!cpath || !*cpath)
+    cpath = MEMNOTIFY_CONF_PATH;
+  const uint  clen = strlen(cpath);
 
   /* Worst case required size estimation + .nm extension */
   if (nlen + clen + 8 >= size)
     return false;
 
-  if ('/' == *name)
+  if ('/' == *name || '.' == *name)
   {
     /* absolute path first */
     memcpy(buffer, name, nlen);
     buffer[nlen] = 0;
   }
-  else if ('.' == *name)
+  else if ('~' == *name)
   {
     /* home folder next */
     const char*    home = getenv("HOME");
@@ -179,8 +184,8 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
       return false;
 
     memcpy(buffer, home, hlen);
-    memcpy(buffer + hlen, name, nlen);
-    buffer[nlen + hlen] = 0;
+    memcpy(buffer + hlen, name + 1, nlen - 1);
+    buffer[nlen + hlen - 1] = 0;
   }
   else if (0 == strncmp(cgStr, name, sizeof(cgStr)-1))
   {
@@ -191,15 +196,15 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
     else
       return false;
 
-    const int rc = snprintf(buffer, size, "%s%s%s", syspart(), current_group, name + sizeof(cgStr) - 1);
+    const int rc = snprintf(buffer, size, "%s%s/%s", syspart(), current_group, name + sizeof(cgStr) - 1);
     return (rc > 0 && (uint)rc < size && 0 == access(buffer, R_OK));
   }
   else
   {
     /* File located in default folder */
-    memcpy(buffer, MEMNOTIFY_CONF_PATH, clen);
-    memcpy(buffer + clen, name, nlen);
-    buffer[clen + nlen] = 0;
+    const int rc = snprintf(buffer, size, "%s/%s", cpath, name);
+    if (rc < 0 || (uint)rc >= size)
+      return false;
   }
 
   /* Verify extension */

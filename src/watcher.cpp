@@ -117,34 +117,38 @@ Watcher :: ~Watcher()
 
 Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theKey) const
 {
-  QString opt = option(theData, theKey);
+  QString     opt = option(theData, theKey);
+  const char* str = opt.toAscii().constData();
 
   if ( opt.isEmpty() )
     return 0;
 
   /* Is that value? */
-  bool   ok = false;
-  ulong val = opt.toULong(&ok);
-  if ( !ok )
+
+  char* endp;
+  ulong val = strtoul(str, &endp, 0);
+
+  if (str == endp)
   {
     /* Might be a file */
-    CachedFile f(opt.toAscii().constData(), 0);
+    CachedFile f(str, 0);
 
     if ( f.load() )
     {
       opt = f.text();
-      val = opt.toULong(&ok);
+      str = opt.toAscii().constData();
+      val = strtoul(str, &endp, 0);
     }
   }
 
   /* Now we have some value and maybe multiplier in opt */
-  if ( ok )
+  if (val && str != endp)
   {
-    if ( opt.endsWith('k', Qt::CaseInsensitive) )
+    if ('k' == *endp || 'K' == *endp)
       val <<= 10;
-    else if ( opt.endsWith('m', Qt::CaseInsensitive) )
+    else if ('m' == *endp || 'M' == *endp)
       val <<= 20;
-    else if ( opt.endsWith('g', Qt::CaseInsensitive) )
+    else if ('g' == *endp || 'G' == *endp)
       val <<= 30;
   }
   else
@@ -159,7 +163,7 @@ Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theK
 void Watcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-    printf ("Watcher %08x: name '%s' type '%s' sensor '%s' free %lu used %lu total %lu handler %d state %d events %u   ",
+    printf ("Watcher %08x: name '%s' type '%s' sensor '%s' free %lu used %lu total limit %lu handler %d state %d events %u   ",
             (uint)this, myName.toAscii().constData(), myType.toAscii().constData(), mySensorPath.toAscii().constData(),
             myMemoryFree, myMemoryUsed, myMemoryLimit, myHandler, myState, myEventsCounter
     );

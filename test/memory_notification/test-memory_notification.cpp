@@ -38,12 +38,19 @@
  * Very simple test application
  * ========================================================================= */
 
-static void listenerObserver(const QString& name, const bool state)
+static void listenerObserver1(const QString& name, const bool state)
 {
-  printf ("CALLBACK: memory signal %s delivered in state %d\n", name.toAscii().constData(), state);
+  printf ("CALLBACK#1: memory signal %s delivered in state %d\n", name.toAscii().constData(), state);
 }
 
-TestApp::TestApp(int argc, char* argv[]): QCoreApplication(argc, argv), myListener(), myNotification(MEMNOTIFY::MemoryNotification::defaultObject())
+static void listenerObserver2(const QString& name, const bool state)
+{
+  printf ("CALLBACK#2: memory signal %s delivered in state %d\n", name.toAscii().constData(), state);
+}
+
+
+TestApp::TestApp(int argc, char* argv[])
+  : QCoreApplication(argc, argv), myListener(), myNotification(MEMNOTIFY::MemoryNotification::defaultObject(argv[1]))
 {
   if ( NULL == (&myNotification) )
   {
@@ -51,9 +58,15 @@ TestApp::TestApp(int argc, char* argv[]): QCoreApplication(argc, argv), myListen
     exit(1);
   }
 
-  if ( !myNotification.addObserver(listenerObserver) )
+  if ( !myNotification.addObserver(listenerObserver1) )
   {
-    printf ("addObserver(%08x) failed\n", (uint)listenerObserver);
+    printf ("addObserver(%08x) failed\n", (uint)listenerObserver1);
+    exit(1);
+  }
+
+  if ( !myNotification.addObserver(listenerObserver2) )
+  {
+    printf ("addObserver(%08x) failed\n", (uint)listenerObserver2);
     exit(1);
   }
 
@@ -65,6 +78,16 @@ TestApp::TestApp(int argc, char* argv[]): QCoreApplication(argc, argv), myListen
     printf ("MemoryNotification is not valid\n");
     exit(1);
   }
+
+  if ( !myNotification.enable() )
+  {
+    printf ("MemoryNotification is not enabled\n");
+    myNotification.dump();
+    exit(1);
+  }
+
+  printf ("MemoryNotification is enabled\n");
+  myNotification.dump();
 }
 
 TestApp::~TestApp()
