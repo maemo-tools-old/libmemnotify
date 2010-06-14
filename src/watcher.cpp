@@ -51,7 +51,7 @@ Watcher :: Watcher(const QSettings& theData, const QString& theName)
     if ( percents(myMemoryLimit) )
     {
       /* percents should be set relatively to system memory usage*/
-      myMemoryLimit = (myMemoryLimit * Platform::defaultObject().memory().total()) / 100;
+      myMemoryLimit = myMemoryLimit * (Platform::defaultObject().memory().total() / 100);
     }
   }
   else
@@ -66,9 +66,8 @@ Watcher :: Watcher(const QSettings& theData, const QString& theName)
     if ( percents(myMemoryUsed) )
     {
       /* percents should be set relatively to overall memory limit */
-      myMemoryUsed = (myMemoryUsed * myMemoryLimit) / 100;
+      myMemoryUsed = myMemoryUsed * (myMemoryLimit / 100);
     }
-
     /* The memory limits should be sane */
     if (myMemoryUsed < myMemoryLimit)
     {
@@ -85,7 +84,7 @@ Watcher :: Watcher(const QSettings& theData, const QString& theName)
     if ( percents(myMemoryFree) )
     {
       /* percents should be set relatively to overall memory limit */
-      myMemoryFree = (myMemoryFree * myMemoryLimit) / 100;
+      myMemoryFree = myMemoryFree * (myMemoryLimit / 100);
     }
 
     /* The memory limits should be sane */
@@ -101,7 +100,7 @@ Watcher :: Watcher(const QSettings& theData, const QString& theName)
   }
   else
   {
-    myMemoryUsed = (max_memory_usage * myMemoryLimit) / 100;
+    myMemoryUsed = max_memory_usage * (myMemoryLimit / 100);
     myMemoryFree = myMemoryLimit - myMemoryUsed;
   }
 } /* Watcher */

@@ -114,6 +114,7 @@ class MEMNOTIFY_EXPORT Watcher
     QString option(const QSettings& theData, const char* theKey, const QVariant& theDefVal = QVariant()) const;
     Size    memoryOption(const QSettings& theData, const char* theKey) const;
     bool    percents(Size memoryOptionValue);
+    bool    updateState();
 
 }; /* Class Watcher */
 
@@ -158,7 +159,7 @@ inline bool Watcher :: enable()
 
   myEventsCounter = 0;
   mySensor = new CachedFile(mySensorPath.toAscii().constData());
-  return (mySensor && mySensor->valid());
+  return updateState();
 }
 
 inline bool Watcher :: disable()
@@ -212,6 +213,22 @@ inline bool Watcher :: percents(Size memoryOptionValue)
 {
   return (memoryOptionValue > 0 && memoryOptionValue <= 100);
 }
+
+inline bool Watcher :: updateState()
+{
+  if (mySensor && mySensor->load())
+  {
+    const Size memoryMeter = (const Size)mySensor->value();
+
+    /* Check that data from sensor is parsed correct */
+    if (memoryMeter > 0)
+    {
+      myState = (memoryMeter > myMemoryUsed);
+      return true;
+    }
+  }
+  return false;
+} /* updateState */
 
 END_MEMOTIFY_NAMESPACE
 QT_END_HEADER

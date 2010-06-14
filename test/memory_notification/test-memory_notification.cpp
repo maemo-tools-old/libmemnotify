@@ -52,42 +52,56 @@ static void listenerObserver2(const QString& name, const bool state)
 TestApp::TestApp(int argc, char* argv[])
   : QCoreApplication(argc, argv), myListener(), myNotification(MEMNOTIFY::MemoryNotification::defaultObject(argv[1]))
 {
+  printf ("* %s %u *\n", __PRETTY_FUNCTION__, __LINE__);
   if ( NULL == (&myNotification) )
   {
     printf ("nulled notification\n");
-    exit(1);
+    ::exit(1);
   }
 
+  printf ("* %s %u *\n", __PRETTY_FUNCTION__, __LINE__);
   if ( !myNotification.addObserver(listenerObserver1) )
   {
     printf ("addObserver(%08x) failed\n", (uint)listenerObserver1);
-    exit(1);
+    ::exit(1);
   }
 
+  printf ("* %s %u *\n", __PRETTY_FUNCTION__, __LINE__);
   if ( !myNotification.addObserver(listenerObserver2) )
   {
     printf ("addObserver(%08x) failed\n", (uint)listenerObserver2);
-    exit(1);
+    ::exit(1);
   }
 
+  printf ("* %s %u *\n", __PRETTY_FUNCTION__, __LINE__);
   connect(&myNotification, SIGNAL(notified(const QString&, const bool)), &myListener, SLOT(notified(const QString&, const bool)));
-  myNotification.dump();
 
+  printf ("* %s %u *\n", __PRETTY_FUNCTION__, __LINE__);
   if ( !myNotification.valid() )
   {
     printf ("MemoryNotification is not valid\n");
-    exit(1);
+    ::exit(1);
   }
 
+  printf ("* %s %u *\n", __PRETTY_FUNCTION__, __LINE__);
   if ( !myNotification.enable() )
   {
     printf ("MemoryNotification is not enabled\n");
     myNotification.dump();
-    exit(1);
+    ::exit(1);
   }
 
-  printf ("MemoryNotification is enabled\n");
+  printf ("* %s %u => MemoryNotification is enabled *\n", __PRETTY_FUNCTION__, __LINE__);
+  if ( !myNotification.poll() )
+  {
+    printf ("MemoryNotification cannot start polling\n");
+    myNotification.dump();
+    ::exit(1);
+  }
+
+  printf ("MemoryNotification::poll() succeed, ready for incoming events\n");
   myNotification.dump();
+  printf ("* %s %u *\n", __PRETTY_FUNCTION__, __LINE__);
 }
 
 TestApp::~TestApp()

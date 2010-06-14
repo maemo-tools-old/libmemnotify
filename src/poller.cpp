@@ -64,6 +64,8 @@ Poller :: ~Poller()
   }
 }
 
+#include <errno.h>
+
 void Poller :: run()
 {
   forever
@@ -71,7 +73,10 @@ void Poller :: run()
     /* block in the poll() call, the descriptors might be closed during that */
     const int retcode = poll(myHandlers, myCounter, -1);
     if (retcode <= 0)
+    {
+      printf ("poll failed with retcode %d error %s\n", retcode, strerror(errno));
       return;
+    }
 
     /* scans the incoming event */
     int  incoming[ myCounter ];

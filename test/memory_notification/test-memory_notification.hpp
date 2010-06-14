@@ -51,7 +51,6 @@ class Listener: public QObject
     inline void notified(const QString& name, const bool state)
     {
       printf ("SIGNAL: memory signal %s delivered in state %d\n", name.toAscii().constData(), state);
-      exit(0);
     }
 };
 

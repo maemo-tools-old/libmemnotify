@@ -89,7 +89,7 @@ bool DebugWatcher :: enable()
 
     if (ifd >= 0)
     {
-      const int wfd = inotify_add_watch(ifd, mySensor->path(), IN_ATTRIB|IN_CLOSE_WRITE);
+      const int wfd = inotify_add_watch(ifd, mySensor->path(), IN_ALL_EVENTS);
       if (wfd >= 0)
       {
         /* seems watch was opened correct */
@@ -141,7 +141,7 @@ bool DebugWatcher :: process()
     {
 #if MEMNOTIFY_DUMP
       const char* name = (ep->len ? ep->name : "");
-      printf ("=> %s: watcher %08x inotify handler %d { wd %d mask %u cookie %u name '%s'}\n",
+      printf ("=> %s: watcher %08x inotify handler %d {wd %d mask %u cookie %u name '%s'}\n",
               __PRETTY_FUNCTION__, (uint)this, myHandler, ep->wd, ep->mask, ep->cookie, name
           );
 #endif
@@ -157,16 +157,10 @@ bool DebugWatcher :: process()
   myEventsCounter += handled;
 
   /* Now if we had events - need to re-load sensor file */
-  if (handled && mySensor->load())
+  if (handled && updateState())
   {
-    const Size memoryMeter = (const Size)mySensor->value();
-
-    /* Check that data from sensor is parsed correct */
-    if (memoryMeter > 0)
-    {
-      myState = (memoryMeter > myMemoryUsed);
+printf ("%s => myState = %u\n", __PRETTY_FUNCTION__, myState);
       return true;
-    }
   }
 
   return false;
@@ -177,7 +171,6 @@ bool DebugWatcher :: valid() const
 {
   if ( Watcher::valid() )
   {
-printf ("Watcher::valid()\n");
     return (mySensor ? mySensor->valid() && myHandler >= 0 && myWatcher >= 0 : myHandler < 0 && myWatcher < 0);
   }
   return false;
