@@ -83,7 +83,7 @@ DebugWatcher :: ~DebugWatcher()
 /* change the watcher activity and change watching to enabled, disabled */
 bool DebugWatcher :: enable()
 {
-  if (valid() && Watcher::enable() )
+  if (valid() && Watcher::enable())
   {
     const int ifd = inotify_init();
 
@@ -163,11 +163,7 @@ bool DebugWatcher :: process()
 /* validate file status and contents */
 bool DebugWatcher :: valid() const
 {
-  if ( Watcher::valid() )
-  {
-    return (mySensor ? mySensor->valid() && myHandler >= 0 && myWatcher >= 0 : myHandler < 0 && myWatcher < 0);
-  }
-  return false;
+  return (Watcher::valid() && (mySensor ? mySensor->valid() && myWatcher >= 0 : myHandler < 0 && myWatcher < 0));
 } /* valid */
 
 void DebugWatcher :: dump() const
