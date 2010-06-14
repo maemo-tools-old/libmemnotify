@@ -167,19 +167,7 @@ bool CgroupsWatcher :: process()
   myEventsCounter += handled;
 
   /* Now if we had events - need to re-load sensor file */
-  if (handled && mySensor->load())
-  {
-    const Size memoryMeter = (const Size)mySensor->value();
-
-    /* Check that data from sensor is parsed correct */
-    if (memoryMeter > 0)
-    {
-      myState = (memoryMeter > myMemoryUsed);
-      return true;
-    }
-  }
-
-  return false;
+  return (handled && updateState());
 } /* process */
 
 /* validate file status and contents */

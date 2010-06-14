@@ -157,13 +157,7 @@ bool DebugWatcher :: process()
   myEventsCounter += handled;
 
   /* Now if we had events - need to re-load sensor file */
-  if (handled && updateState())
-  {
-printf ("%s => myState = %u\n", __PRETTY_FUNCTION__, myState);
-      return true;
-  }
-
-  return false;
+  return (handled && updateState());
 } /* process */
 
 /* validate file status and contents */
