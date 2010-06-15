@@ -46,7 +46,7 @@ Poller :: Poller(QObject* notification, const int* handlers, const uint counter)
       for (uint index = 0; index < counter; index++)
       {
         myHandlers[index].fd = handlers[index];
-        myHandlers[index].events = POLLIN|POLLPRI|POLLOUT;
+        myHandlers[index].events  = POLLIN|POLLPRI|POLLOUT;
         myHandlers[index].revents = 0;
       }
       setTerminationEnabled(true);
@@ -82,15 +82,15 @@ void Poller :: run()
     int  incoming[ myCounter ];
     uint iget;
     uint iput;
-
     for (iget = 0, iput = 0; iget < myCounter; iget++)
     {
-      /* anything ourside mask means we should exit */
-      if (0 == (myHandlers[iget].events & myHandlers[iget].revents))
-        return;
-      /* something as expected, this fd should be re-checked for detailed info */
-      myHandlers[iget].revents = 0;
-      incoming[iput++] = myHandlers[iget].fd;
+      /* anything loaded means we should handle it */
+      if ( myHandlers[iget].revents )
+      {
+        /* something as expected, this fd should be re-checked for detailed info */
+        myHandlers[iget].revents = 0;
+        incoming[iput++] = myHandlers[iget].fd;
+      }
     }
 
     /* Notify the parent object */

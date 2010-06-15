@@ -157,7 +157,7 @@ bool DebugWatcher :: process()
   myEventsCounter += handled;
 
   /* Now if we had events - need to re-load sensor file */
-  return (handled && updateState());
+  return updateState();
 } /* process */
 
 /* validate file status and contents */

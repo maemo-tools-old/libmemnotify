@@ -110,7 +110,8 @@ bool MemoryNotification :: poll()
 
   /* Now construct the poller object */
   myPoller = new Poller(this, handlers, counter);
-  return myPoller->isRunning();
+  QThread::yieldCurrentThread();
+  return (myPoller && myPoller->isRunning());
 } /* poll */
 
 uint MemoryNotification :: query(int* fds, uint size)
@@ -304,7 +305,7 @@ void MemoryNotification :: dump() const
 {
 #if MEMNOTIFY_DUMP
   printf ("MemoryNotification %08x {\n", (uint)this);
-  printf ("  outMemoryNotification %08x signal counter %u enabled %d polling thread %08x\n",
+  printf ("  ourMemoryNotification %08x signal counter %u enabled %d polling thread %08x\n",
           (uint)ourMemoryNotification, mySignalCounter, myEnabled, (uint)myPoller
       );
 
