@@ -83,6 +83,20 @@ type=debug -- this controller will use pointed sensor file with inotify access t
   nothing additional, you can "echo currentMem > sensor" to see updates in application
 
 
+Requirements for cgroups
+------------------------
+
+The memory accounting should be enabled in cgroups. In addition to that the memory.use_hierarchy MUST be set to 1.
+This file is inherited automatic in nested groups, so it is enough to do once.
+In case if precise accounting of used memory for nested tasks is required, the memory.move_charge_at_immigrate
+for all subgroups must be set to 1 also to report proper thresholds values.
+
+Example of ohmd mounting used for debugging is:
+        mount -t cgroup -o rw,relatime,freezer,memory,cpu none /syspart
+        echo 1 > /syspart/memory.move_charge_at_immigrate
+        echo 1 > /syspart/memory.use_hierarchy
+
+
 Classes details
 ---------------
 

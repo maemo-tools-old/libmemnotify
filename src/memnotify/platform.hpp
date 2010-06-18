@@ -101,7 +101,8 @@ class MEMNOTIFY_EXPORT Platform
     /* or some path. True if file is exists, false - not hanled or not exists        */
     bool path(const char* name, char* buffer, uint size) const;
 
-    /* Current process cgroup status, loaded as /proc/self/cgroup */
+    /* Current process cgroup status, loaded as /proc/self/cgroup           */
+    /* Example /proc/self/cgroup contents: 1:freezer,memory,cpu:/GROUP_NAME */
     const char* cgroup() const;
 
     /* Options reading */

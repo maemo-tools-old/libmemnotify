@@ -34,7 +34,6 @@
 #include <QThread>
 #include <memnotify/definitions.hpp>
 #include <memnotify/watcher.hpp>
-#include <memnotify/poller.hpp>
 
 QT_BEGIN_HEADER
 BEGIN_MEMNOTIFY_NAMESPACE
@@ -125,7 +124,7 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
     QList<Watcher*> myWatchers;   /* list of watchers/thresholds, expected to be 1 or 2 usually, 10+ means design problems  */
     uint        mySignalCounter;  /* how many objects called connect() for this one as a source */
     bool        myEnabled;        /* are we enabled or disabled? Just for fast checks           */
-    Poller*     myPoller;         /* the thread to call poll if we are not using the main loop, it is alive from poll till disable call */
+    QThread*    myPoller;         /* the thread to call poll if we are not using the main loop, it is alive from poll till disable call */
 
 }; /* Class MemoryNotification */
 

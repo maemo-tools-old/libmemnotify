@@ -44,19 +44,20 @@ Watcher :: Watcher(const QSettings& theData, const QString& theName)
     myHandler(-1), mySensor(NULL), myState(false), myEventsCounter(0)
 {
   uint max_memory_usage = 100;
+  const Platform::Size platform_total = Platform::defaultObject().memory().total();
 
   /* Now evaluating memory limits */
-  if ( myMemoryLimit )
+  if (myMemoryLimit && myMemoryLimit < platform_total)
   {
     if ( percents(myMemoryLimit) )
     {
       /* percents should be set relatively to system memory usage*/
-      myMemoryLimit = myMemoryLimit * (Platform::defaultObject().memory().total() / 100);
+      myMemoryLimit = myMemoryLimit * (platform_total / 100);
     }
   }
   else
   {
-    myMemoryLimit = Platform::defaultObject().memory().total();
+    myMemoryLimit = platform_total;
     max_memory_usage = 95;  /* Kernel OOM allows us to use only 97% of memory, so let's keep 2% below killing */
   }
 
@@ -137,6 +138,9 @@ Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theK
       opt = f.text();
       str = opt.toAscii().constData();
       val = strtoul(str, &endp, 0);
+      /* cgroups may deliver very huge values like (unsigned)-1 */
+      if (ULONG_MAX == val)
+        val = 0;
     }
   }
 
@@ -162,8 +166,9 @@ Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theK
 void Watcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-    printf ("Watcher %08x: name '%s' type '%s' sensor '%s' free %lu used %lu total limit %lu handler %d state %d events %u   ",
-            (uint)this, myName.toAscii().constData(), myType.toAscii().constData(), mySensorPath.toAscii().constData(),
+    printf ("Watcher %08x: name '%s' type '%s' sensor %08x '%s' free %lu used %lu total limit %lu handler %d state %d events %u   ",
+            (uint)this, myName.toAscii().constData(), myType.toAscii().constData(),
+            (uint)mySensor, mySensorPath.toAscii().constData(),
             myMemoryFree, myMemoryUsed, myMemoryLimit, myHandler, myState, myEventsCounter
     );
     if ( mySensor )

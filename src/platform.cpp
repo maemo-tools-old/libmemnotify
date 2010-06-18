@@ -196,7 +196,7 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
     else
       return false;
 
-    const int rc = snprintf(buffer, size, "%s%s/%s", syspart(), current_group, name + sizeof(cgStr) - 1);
+    const int rc = snprintf(buffer, size, "%s%s%s", syspart(), current_group, name + sizeof(cgStr) - 1);
     return (rc > 0 && (uint)rc < size && 0 == access(buffer, R_OK));
   }
   else
@@ -224,22 +224,33 @@ const char* Platform :: cgroup() const
   if (NULL == cgf)
     cgf = new CachedFile("/proc/self/cgroup");
 
-  return (cgf && cgf->load() ? cgf->text() : NULL);
+  /* example /proc/self/cgroup contents: 1:freezer,memory,cpu:/GROUP_NAME */
+  if (cgf && cgf->load())
+  {
+    /* cutting off eol */
+    char* text = (char*)(cgf->text());
+    char* eol  = strrchr(text, '\n');
+    if ( eol )
+      *eol = 0;
+    return text;
+  }
+
+  return NULL;
 } /* cgroup */
 
 void Platform :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("Platform %08x { syspart '%s' ",
-          (uint)this, (mySyspart ? mySyspart : "")
+  printf ("Platform %08x { syspart '%s' cgroup '%s' ",
+          (uint)this, (mySyspart ? mySyspart : ""), cgroup()
     );
 
   printf ("options %08x = [", (uint)(&myOptions));
   foreach (Option option, myOptions)
   {
-    printf ("%s = %s;", option.first.toAscii().constData(), option.second.toAscii().constData());
+    printf ("  %s = %s;", option.first.toAscii().constData(), option.second.toAscii().constData());
   }
-  printf ("]\n");
+  printf ("  ]\n");
 
   myMemory.dump();
   printf ("}\n");

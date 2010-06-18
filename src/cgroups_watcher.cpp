@@ -173,10 +173,13 @@ bool CgroupsWatcher :: process()
 /* validate file status and contents */
 bool CgroupsWatcher :: valid() const
 {
-  char tmp[PATH_MAX];
-  if (Platform::defaultObject().path(myControlPath.toAscii().constData(), tmp, sizeof(tmp)) && Watcher::valid())
+  if ( Watcher::valid() )
   {
-    return (mySensor ? mySensor->valid() && myHandler >= 0 : myHandler < 0);
+    char tmp[PATH_MAX];
+    if (Platform::defaultObject().path(myControlPath.toAscii().constData(), tmp, sizeof(tmp)) )
+    {
+      return (mySensor ? mySensor->valid() && myHandler >= 0 : myHandler < 0);
+    }
   }
   return false;
 } /* valid */

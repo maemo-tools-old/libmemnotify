@@ -34,6 +34,7 @@
 #include <QSettings>
 #include <memnotify/watcher_builder.hpp>
 #include <memnotify/memory_notification.hpp>
+#include <memnotify/poller.hpp>
 
 BEGIN_MEMNOTIFY_NAMESPACE
 
@@ -73,7 +74,12 @@ bool MemoryNotification :: setup(const char* pathSpecification)
       if ( newcomer )
       {
 #if MEMNOTIFY_DUMP
-        Q_ASSERT(true == newcomer->valid());
+        const bool newcomerIsValid = newcomer->valid();
+        if ( !newcomerIsValid )
+        {
+          newcomer->dump();
+          Q_ASSERT(true == newcomerIsValid);
+        }
 #endif
         myWatchers.append(newcomer);
       }
