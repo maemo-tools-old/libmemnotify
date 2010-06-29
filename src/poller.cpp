@@ -26,8 +26,8 @@
 * Includes.
 * ========================================================================= */
 
-#include <memnotify/poller.hpp>
 #include <memnotify/memory_notification.hpp>
+#include "poller.hpp"
 
 BEGIN_MEMNOTIFY_NAMESPACE
 

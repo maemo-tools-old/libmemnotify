@@ -34,7 +34,7 @@
 #include <QSettings>
 #include <memnotify/watcher_builder.hpp>
 #include <memnotify/memory_notification.hpp>
-#include <memnotify/poller.hpp>
+#include "poller.hpp"
 
 BEGIN_MEMNOTIFY_NAMESPACE
 
