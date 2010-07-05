@@ -16,8 +16,8 @@ Initialization will be handled according to control files (see below), by defaul
   [System Memory Low]
   type=cgroups_control
   control=/syspart/cgroup.event_control
-  limit=/syspart/memory.memsw.memory_limit_in_bytes
-  sensor=/syspart/memory.memsw.memory_usage_in_bytes
+  limit=/syspart/memory.memsw.limit_in_bytes
+  sensor=/syspart/memory.memsw.usage_in_bytes
   used=90%
 
 To construct the object you can use explicit or implicit constructor call

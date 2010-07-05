@@ -3,4 +3,4 @@ type=cgroups
 control=/syspart/cgroup.event_control
 limit=/syspart/memory.memsw.limit_in_bytes
 sensor=/syspart/memory.memsw.usage_in_bytes
-used=20%
+used=90%
