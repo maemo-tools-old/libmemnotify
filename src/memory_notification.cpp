@@ -61,7 +61,17 @@ bool MemoryNotification :: setup(const char* pathSpecification)
 
   foreach(QString file, files)
   {
-    const QSettings   config(file, QSettings::IniFormat);
+    char  filePath[BUFSIZ];
+
+    if ( !Platform::defaultObject().path(file.toAscii().constData(), filePath, sizeof(filePath)) )
+    {
+#if MEMNOTIFY_DUMP
+      printf ("* cannot resolve %s as a valid path (%s) => skipped\n", file.toAscii().constData(), filePath);
+      continue;
+#endif
+    }
+
+    const QSettings   config(filePath, QSettings::IniFormat);
     /* array with names of thresholds */
     const QStringList tholds(config.childGroups());
 
