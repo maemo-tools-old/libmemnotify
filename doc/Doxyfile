@@ -85,9 +85,9 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ../src/plugins
+INPUT                  = ../src
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.cpp *.h
+FILE_PATTERNS          = *.cpp *.hpp
 RECURSIVE              = YES
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO

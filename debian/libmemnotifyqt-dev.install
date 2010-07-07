@@ -1,2 +1,4 @@
 usr/include/memnotify/*
 usr/lib/libmemnotifyqt.so
+usr/lib/pkgconfig/libmemnotifyqt.pc
+

@@ -2,34 +2,47 @@ Source: libmemnotifyqt
 Section: libs
 Priority: optional
 Maintainer: Leonid Moiseichuk <leonid.moiseichuk@nokia.com>
-Build-Depends: debhelper (>= 5), libqt4-dev (>= 4.5), libqt4-test (>= 4.5), doxygen, graphviz
-Standards-Version: 3.7.3
+Build-Depends: debhelper (>= 5), libqt4-dev (>= 4.5), libqt4-test (>= 4.5), doxygen, graphviz, cdbs, dejavu-fonts 
+Standards-Version: 3.8.0
 Description: Memory Notification library Qt-style.
+ The libmemnotifyqt implements a notification for memory usage events
+ according to levels specified in control file.
+
+Package: libmemnotifyqt0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Memory Notification library Qt-style.
+ The libmemnotifyqt implements a notification for memory usage events
+ according to levels specified in control file.
 
 Package: libmemnotifyqt-dev
 Section: libdevel
 Architecture: any
-Depends: libmemnotifyqt (= ${binary:Version}), libqt4-dev (>= 4.5)
+Depends: libmemnotifyqt0 (= ${binary:Version}), libqt4-dev (>= 4.5), ${misc:Depends}
 Recommends: libmemnotifyqt-doc
 Description: Memory Notification library Qt-style.
  Development package for Memory Notification.
 
-Package: libmemnotifyqt-dbg
+Package: libmemnotifyqt0-dbg
 Section: libdevel
 Priority: extra
 Architecture: any
-Depends: libmemnotifyqt (= ${binary:Version})
+Depends: libmemnotifyqt0 (= ${binary:Version}), ${misc:Depends}
 Description: Memory Notification library Qt-style. Debugging package.
+ Debug package for Memory Notification.
 
 Package: libmemnotifyqt-doc
 Section: doc
 Architecture: any
-Recommends: libmemnotifyqt, libmemnotifyqt-dev
+Recommends: libmemnotifyqt-dev (= ${binary:Version}), ${misc:Depends}
 Description: Memory Notification library Qt-style. Documentation for developers.
+ Documenation for Memory Notification.
 
 Package: libmemnotifyqt-test
 Section: libdevel
 Priority: extra
 Architecture: any
-Depends: libmemnotifyqt (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libmemnotifyqt0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Memory Notification library Qt-style. Testing files.
+ Tests for Memory Notification.

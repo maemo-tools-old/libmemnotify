@@ -1,3 +1,1 @@
-usr/tests/tst_* usr/lib/libmemnotifyqt/tests
-usr/tests/run_libmemnotifyqt.sh usr/lib/libmemnotifyqt/tests
-usr/tests/testdata/* /usr/share/libmemnotifyqt
+usr/lib/libmemnotifyqt/tests

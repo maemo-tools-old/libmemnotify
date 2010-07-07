@@ -18,6 +18,12 @@ SOURCES += debug_watcher.cpp
 SOURCES += poller.cpp 
 SOURCES += memory_notification.cpp 
 DEFINES += QT_DLL MEMNOTIFY_SHARED MEMNOTIFY_VERSION=\\\"$${VERSION}\\\"
-CONFIG  += qt warn_on debug_and_release build_all
+CONFIG  += qt warn_on release build_all
 QT -= gui
 
+target.path = /usr/lib
+
+includes.path = /usr/include
+includes.files = memnotify
+
+INSTALLS += includes target

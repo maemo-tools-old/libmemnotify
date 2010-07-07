@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/memnotify
+
+Name: libmemnotify
+Description: Memory notification stuff
+Version: 0.1.0
+Libs: -L${libdir} -lmemnotifyqt
+Cflags: -I${includedir}

@@ -21,3 +21,10 @@ SOURCES += test-memory_notification.cpp
 DEFINES += MEMNOTIFY_VERSION=\\\"$${VERSION}\\\"
 CONFIG  += qt warn_on debug build_all
 QT -= gui
+
+target.path = /usr/lib/libmemnotifyqt/tests
+
+extra.files = debug.mn cgroup.nm sensor.txt
+extra.path = /usr/lib/libmemnotifyqt/tests
+
+INSTALLS += target extra

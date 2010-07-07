@@ -1,13 +1,12 @@
 dox.target = doc
-contains(CONFIG, nodoc) {
-dox.commands = mkdir -p $$PWD/html && touch $$PWD/html/not_docs_here_yet
-}
-else {
-dox.commands = doxygen $$PWD/Doxyfile
-}
+dox.commands = doxygen
+dox.files = html/* 
+dox.path  = /usr/share/doc/libmemnotifyqt-doc/html
 dox.depends =
-dox.files = html
-dox.path  = $$ASD_INSTALL_ROOT/share/doc/libmemnotifyqt
-QMAKE_EXTRA_TARGETS += dox
 
-INSTALLS += dox
+texts.files = design.txt environment.txt
+texts.path = /usr/share/doc/libmemnotifyqt-doc
+texts.depends = 
+
+QMAKE_EXTRA_TARGETS += dox
+INSTALLS += dox texts

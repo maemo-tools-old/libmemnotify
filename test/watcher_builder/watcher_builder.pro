@@ -12,3 +12,7 @@ SOURCES += test-watcher_builder.cpp
 DEFINES += MEMNOTIFY_VERSION=\\\"$${VERSION}\\\"
 CONFIG  += qt warn_on debug build_all
 QT -= gui
+
+target.path = /usr/lib/libmemnotifyqt/tests
+
+INSTALLS += target

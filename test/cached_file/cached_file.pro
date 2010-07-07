@@ -8,3 +8,7 @@ SOURCES += test-cached_file.cpp
 DEFINES += MEMNOTIFY_VERSION=\\\"$${VERSION}\\\"
 CONFIG  += qt warn_on debug build_all
 QT -= gui
+
+target.path = /usr/lib/libmemnotifyqt/tests
+
+INSTALLS += target

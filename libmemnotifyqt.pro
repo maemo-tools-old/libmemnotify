@@ -3,12 +3,13 @@ TEMPLATE = subdirs
 SUBDIRS = \
           doc \
           src \
-#          test
+          test
 
-CONFIG += ordered
-
-# Make it so projects can find our specific features
-system(echo QMAKEFEATURES+=$$PWD/features > $$OUT_PWD/.qmake.cache)
+CONFIG += release
 
 QMAKE_CLEAN += configure-stamp
 
+pc.files = libmemnotifyqt.pc
+pc.path = /usr/lib/pkgconfig
+
+INSTALLS += pc
