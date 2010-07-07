@@ -67,8 +67,8 @@ bool MemoryNotification :: setup(const char* pathSpecification)
     {
 #if MEMNOTIFY_DUMP
       printf ("* cannot resolve %s as a valid path (%s) => skipped\n", file.toAscii().constData(), filePath);
-      continue;
 #endif
+      continue;
     }
 
     const QSettings   config(filePath, QSettings::IniFormat);
