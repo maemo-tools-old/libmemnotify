@@ -1,6 +1,12 @@
+libmemnotifyqt (0.1.1) unstable; urgency=low
+
+  * Package default policy. Fixes: NB#175814
+
+ -- Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Fri, 09 Jul 2010 14:30:57 +0300
+
 libmemnotifyqt (0.1.0) unstable; urgency=low
 
-   * Initial release
+  * Initial release
 
  -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Thu, 19 Mar 2010 16:23:33 +2000
 

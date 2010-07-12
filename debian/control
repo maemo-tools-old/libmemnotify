@@ -11,7 +11,7 @@ Description: Memory Notification library Qt-style.
 Package: libmemnotifyqt0
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, memnotify-settings
 Description: Memory Notification library Qt-style.
  The libmemnotifyqt implements a notification for memory usage events
  according to levels specified in control file.
@@ -46,3 +46,11 @@ Architecture: any
 Depends: libmemnotifyqt0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Memory Notification library Qt-style. Testing files.
  Tests for Memory Notification.
+
+Package: memnotify-settings-default
+Section: libs
+Priority: extra
+Architecture: any
+Provides: memnotify-settings
+Description: Memory Notification library Qt-style. Default settings.
+ Default policy settings for memnotify.
