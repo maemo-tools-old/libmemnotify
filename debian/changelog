@@ -1,3 +1,9 @@
+libmemnotifyqt (0.1.2) unstable; urgency=low
+
+  * Fix build with HardFP toolchain (GCC 4.4). Fixes: NB#182623
+
+ -- Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Wed, 04 Aug 2010 13:45:47 +0300
+
 libmemnotifyqt (0.1.1) unstable; urgency=low
 
   * Package default policy. Fixes: NB#175814
