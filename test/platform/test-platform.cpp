@@ -37,7 +37,7 @@
  * Very simple test application
  * ========================================================================= */
 
-int main(const int argc, const char* argv[])
+int main(void)
 {
   MEMNOTIFY::Platform& p = MEMNOTIFY::Platform::defaultObject();
 
