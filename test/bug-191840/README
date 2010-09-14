@@ -1,0 +1,9 @@
+1. su - user
+2. Run the program
+
+EXPECTED OUTCOME:
+Return value from enable call is true
+
+ACTUAL OUTCOME:
+Program outputs false as enable call result, and call to poll fails after this.
+When run as root both succeeds.

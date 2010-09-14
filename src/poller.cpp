@@ -46,7 +46,7 @@ Poller :: Poller(QObject* notification, const int* handlers, const uint counter)
       for (uint index = 0; index < counter; index++)
       {
         myHandlers[index].fd = handlers[index];
-        myHandlers[index].events  = POLLIN|POLLPRI|POLLOUT;
+        myHandlers[index].events  = POLLIN|POLLPRI;
         myHandlers[index].revents = 0;
       }
       setTerminationEnabled(true);

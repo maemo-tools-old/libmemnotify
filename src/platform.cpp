@@ -197,7 +197,7 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
       return false;
 
     const int rc = snprintf(buffer, size, "%s%s%s", syspart(), current_group, name + sizeof(cgStr) - 1);
-    return (rc > 0 && (uint)rc < size && 0 == access(buffer, R_OK));
+    return (rc > 0 && (uint)rc < size && 0 == access(buffer, F_OK));
   }
   else
   {
@@ -208,12 +208,12 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
   }
 
   /* Verify extension */
-  if (NULL == strrchr(buffer, '.') && access(buffer, R_OK))
+  if (NULL == strrchr(buffer, '.') && access(buffer, F_OK))
   {
     strcat(buffer, ".mn");
   }
 
-  return (0 == access(buffer, R_OK));
+  return (0 == access(buffer, F_OK));
 } /* path */
 
 const char* Platform :: cgroup() const

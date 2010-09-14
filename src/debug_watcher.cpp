@@ -153,11 +153,17 @@ bool DebugWatcher :: process()
       break;
   } /* while */
 
-  /* Increase number of handled events */
-  myEventsCounter += handled;
-
-  /* Now if we had events - need to re-load sensor file */
-  return updateState();
+  /* Increase number of handled events if we have something to process */
+  if (handled > 0)
+  {
+    /* Now if we had events - need to re-load sensor file */
+    myEventsCounter += handled;
+    return updateState();
+  }
+  else
+  {
+    return false;
+  }
 } /* process */
 
 /* validate file status and contents */
