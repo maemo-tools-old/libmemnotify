@@ -118,13 +118,14 @@ Watcher :: ~Watcher()
 
 Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theKey) const
 {
-  QString     opt = option(theData, theKey);
-  const char* str = opt.toAscii().constData();
+  QString  opt = option(theData, theKey);
 
   if ( opt.isEmpty() )
     return 0;
 
   /* Is that value? */
+  char     str[opt.length() + 1];
+  strcpy(str, opt.toAscii().constData());
 
   char* endp;
   ulong val = strtoul(str, &endp, 0);
@@ -136,9 +137,7 @@ Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theK
 
     if ( f.load() )
     {
-      opt = f.text();
-      str = opt.toAscii().constData();
-      val = strtoul(str, &endp, 0);
+      val = strtoul(f.text(), &endp, 0);
       /* cgroups may deliver very huge values like (unsigned)-1 */
       if (ULONG_MAX == val)
         val = 0;

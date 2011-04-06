@@ -107,7 +107,7 @@ class MEMNOTIFY_EXPORT Platform
 
     /* Options reading */
     const Options& options() const;
-    const char*    option(const char* name) const;
+    const QString& option(const char* name) const;
 
     void dump() const;
 
@@ -129,11 +129,14 @@ class MEMNOTIFY_EXPORT Platform
     ~Platform();
 
     /* Miscellaneous methods to support Platform */
-    bool syspart(const char*);
+    bool setupCgroups(const char*);
     bool parseOptions();
 
     /* Shared data for singletone object */
     static Platform* ourPlatform;
+
+    /* Shared unknown/null string object */
+    static const QString ourNull;
 }; /* Class Platform */
 
 /* ========================================================================= *
@@ -187,9 +190,9 @@ inline Platform :: Platform()
   parseOptions();
 
   /* Now check the mount point for cgroups */
-  if ( !syspart(option("cgroups_mount_point")) )
+  if ( !setupCgroups(option("cgroups_mount_point").toAscii().constData()) )
   {
-    syspart(MEMNOTIFY_CGROUPS_MOUNT_POINT);
+    setupCgroups(MEMNOTIFY_CGROUPS_MOUNT_POINT);
   }
 }
 
@@ -218,17 +221,17 @@ inline const Platform::Options& Platform :: options() const
   return myOptions;
 }
 
-inline const char* Platform :: option(const char* name) const
+inline const QString& Platform :: option(const char* name) const
 {
   if (name && *name && myOptions.size() > 0)
   {
     const int index = myOptions.indexOf( Option(name,QString()) );
     if (index >= 0)
-      return myOptions.at(index).second.toAscii().constData();
+      return myOptions.at(index).second;
   }
 
   /* Search failed by some reason */
-  return NULL;
+  return ourNull;
 }
 
 inline Platform& Platform :: defaultObject()

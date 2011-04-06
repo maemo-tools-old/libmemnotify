@@ -61,6 +61,7 @@ void Platform::SystemMemory :: dump() const
  * ========================================================================= */
 
 Platform* Platform :: ourPlatform = NULL;
+const QString Platform :: ourNull;
 
 
 bool Platform :: parseOptions()
@@ -88,7 +89,7 @@ bool Platform :: parseOptions()
 } /* parseOptions */
 
 
-bool Platform :: syspart(const char* str)
+bool Platform :: setupCgroups(const char* str)
 {
   static char* mountpath = NULL;
 
@@ -137,7 +138,7 @@ bool Platform :: syspart(const char* str)
   {
     return false;
   }
-}  /* syspart */
+}  /* setupCgroups */
 
 
 bool Platform :: path(const char* name, char* buffer, uint size) const
@@ -159,9 +160,12 @@ bool Platform :: path(const char* name, char* buffer, uint size) const
   const uint nlen = strlen(name);
 
   /* Check configuration path files location */
-  const char* cpath = option("config");
-  if (!cpath || !*cpath)
-    cpath = MEMNOTIFY_CONF_PATH;
+  QString strPath = option("config");
+  if (strPath.isEmpty())
+    strPath = MEMNOTIFY_CONF_PATH;
+
+  char cpath[strPath.length() + 1];
+  strcpy(cpath, strPath.toAscii().constData());
   const uint  clen = strlen(cpath);
 
   /* Worst case required size estimation + .nm extension */
