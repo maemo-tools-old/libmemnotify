@@ -9,7 +9,7 @@ SOURCES += $$SRC/platform.cpp
 SOURCES += $$SRC/watcher_builder.cpp 
 SOURCES += $$SRC/watcher.cpp
 SOURCES += test-watcher_builder.cpp
-DEFINES += MEMNOTIFY_VERSION=\\\"$${VERSION}\\\"
+DEFINES += UNIT_TEST MEMNOTIFY_VERSION=\\\"$${VERSION}\\\"
 CONFIG  += qt warn_on debug build_all
 QT -= gui
 

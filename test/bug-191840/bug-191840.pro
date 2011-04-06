@@ -16,6 +16,8 @@ SOURCES += $$SRC/watcher_builder.cpp
 SOURCES += $$SRC/watcher.cpp
 SOURCES += main.cpp
 
+DEFINES += UNIT_TEST
+
 CONFIG  += qt warn_on debug build_all
 
 target.path = /usr/lib/libmemnotifyqt/tests
