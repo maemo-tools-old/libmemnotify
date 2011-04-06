@@ -1,3 +1,11 @@
+libmemnotifyqt (0.1.4) unstable; urgency=low
+
+  * Fix issue with handling string data reported by Valgrind. Fixes: NB#241974
+  * Reduce default limit to 85% due to 90% seems too high for current leaking
+    system and produce visible UI slowdown.
+
+ -- Tommi Rantala <ext-tommi.1.rantala@nokia.com>  Wed, 06 Apr 2011 15:50:29 +0300
+
 libmemnotifyqt (0.1.3) unstable; urgency=low
 
   * Fix issue with permissions to file access. Fixes: NB#191840
