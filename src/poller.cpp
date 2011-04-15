@@ -57,10 +57,13 @@ Poller :: Poller(QObject* notification, const int* handlers, const uint counter)
 
 Poller :: ~Poller()
 {
-  wait();
-  if ( myHandlers )
+  struct pollfd* forfree = myHandlers;
+
+  myHandlers = NULL;
+  if (forfree)
   {
-    delete myHandlers;
+    wait();
+    delete [] forfree;
   }
 }
 
@@ -68,6 +71,9 @@ void Poller :: run()
 {
   forever
   {
+    if ( !myHandlers )
+      return;
+
     /* block in the poll() call, the descriptors might be closed during that */
     const int retcode = poll(myHandlers, myCounter, -1);
     if (retcode <= 0)
@@ -77,7 +83,7 @@ void Poller :: run()
     int  incoming[ myCounter ];
     uint iget;
     uint iput;
-    for (iget = 0, iput = 0; iget < myCounter; iget++)
+    for (iget = 0, iput = 0; myHandlers && iget < myCounter; iget++)
     {
       /* anything loaded means we should handle it */
       if ( myHandlers[iget].revents )
