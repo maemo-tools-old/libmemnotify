@@ -1,3 +1,10 @@
+libmemnotifyqt (0.1.5) unstable; urgency=low
+
+  * Fix strange issue with unsafe delete reported by valgrind.
+    Fixes: NB#247104
+
+ -- Tommi Rantala <ext-tommi.1.rantala@nokia.com>  Fri, 15 Apr 2011 12:42:52 +0300
+
 libmemnotifyqt (0.1.4) unstable; urgency=low
 
   * Fix issue with handling string data reported by Valgrind. Fixes: NB#241974
