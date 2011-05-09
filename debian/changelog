@@ -2,6 +2,8 @@ libmemnotifyqt (0.1.6) unstable; urgency=low
 
   * Change MemoryNotification::disable() order to remove problems with closing
     thread to improve bug 250424.
+  * Increase system-wide memory limit to 90% due to now we have compressed
+    swap and memory stabilized on different level. Fixes: NB#252036
 
  -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Mon, 06 May 2011 15:35:47 +0300
 

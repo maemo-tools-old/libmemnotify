@@ -60,25 +60,27 @@ Poller :: ~Poller()
   struct pollfd* forfree = myHandlers;
 
   myHandlers = NULL;
-  if (forfree)
+  if ( isRunning() )
   {
     terminate();
     wait(1000);
-    delete [] forfree;
   }
-}
+
+  if (forfree)
+    delete [] forfree;
+} /* ~Poller */
 
 void Poller :: run()
 {
   forever
   {
     if ( !myHandlers )
-      return;
+      exit(-1);
 
     /* block in the poll() call, the descriptors might be closed during that */
     const int retcode = poll(myHandlers, myCounter, -1);
     if (retcode <= 0)
-      return;
+      exit(-1);
 
     /* scans the incoming event */
     int  incoming[ myCounter ];
@@ -100,7 +102,7 @@ void Poller :: run()
     {
       QObject* p = parent();
       if (!p || !reinterpret_cast<MemoryNotification*>(p)->process(incoming, iput))
-        return;
+        exit(-1);
     }
   } /* forever */
 } /* run */
