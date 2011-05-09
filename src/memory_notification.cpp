@@ -251,6 +251,14 @@ bool MemoryNotification :: disable()
   if ( !myEnabled )
     return false;
 
+  /* if poller is running - remove it. Likely thread will finished already */
+  if ( myPoller )
+  {
+    myPoller->terminate();
+    delete myPoller;
+    myPoller = NULL;
+  }
+
   /* disable watchers one by one */
   int disabled_counter = 0;
   foreach(Watcher* watcher, myWatchers)
@@ -260,14 +268,6 @@ bool MemoryNotification :: disable()
       /* item successfully disabled */
       disabled_counter++;
     }
-  }
-
-  /* if poller is running - remove it. Likely thread will finished already */
-  if ( myPoller )
-  {
-    myPoller->terminate();
-    delete myPoller;
-    myPoller = NULL;
   }
 
   /* set common enabled flag off only if we have all items disabled */

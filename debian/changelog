@@ -1,3 +1,10 @@
+libmemnotifyqt (0.1.6) unstable; urgency=low
+
+  * Change MemoryNotification::disable() order to remove problems with closing
+    thread to improve bug 250424.
+
+ -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Mon, 06 May 2011 15:35:47 +0300
+
 libmemnotifyqt (0.1.5) unstable; urgency=low
 
   * Fix strange issue with unsafe delete reported by valgrind.

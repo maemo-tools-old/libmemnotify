@@ -62,7 +62,8 @@ Poller :: ~Poller()
   myHandlers = NULL;
   if (forfree)
   {
-    wait();
+    terminate();
+    wait(1000);
     delete [] forfree;
   }
 }
