@@ -110,6 +110,8 @@ bool MemoryNotification :: poll()
   /* that is strange but possible */
   if ( myPoller )
   {
+    QMutexLocker locker(&myMutex);
+
     if ( myPoller->isRunning() )
       return true;
     /* poller needs to be re-created */
@@ -126,6 +128,7 @@ bool MemoryNotification :: poll()
     return false;
 
   /* Now construct the poller object */
+  QMutexLocker locker(&myMutex);
   myPoller = new Poller(this, handlers, counter);
   QThread::yieldCurrentThread();
   return (myPoller && myPoller->isRunning());
@@ -133,6 +136,7 @@ bool MemoryNotification :: poll()
 
 uint MemoryNotification :: query(int* fds, uint size)
 {
+  QMutexLocker locker(&myMutex);
   uint counter = 0;
   if (myEnabled && fds && myWatchers.count() <= (int)size)
   {
@@ -150,6 +154,8 @@ uint MemoryNotification :: query(int* fds, uint size)
 
 bool MemoryNotification :: process(const int* fds, uint counter)
 {
+  QMutexLocker locker(&myMutex);
+
   /* we should be enabled */
   if ( !myEnabled )
     return false;
@@ -219,6 +225,8 @@ bool MemoryNotification :: process(const int* fds, uint counter)
 
 bool MemoryNotification :: enable()
 {
+  QMutexLocker locker(&myMutex);
+
   if ( myEnabled )
     return false;
 
@@ -248,6 +256,8 @@ bool MemoryNotification :: enable()
 
 bool MemoryNotification :: disable()
 {
+  QMutexLocker locker(&myMutex);
+
   if ( !myEnabled )
     return false;
 

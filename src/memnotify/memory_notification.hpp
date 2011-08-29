@@ -32,6 +32,8 @@
 #include <QObject>
 #include <QString>
 #include <QThread>
+#include <QMutex>
+#include <QMutexLocker>
 #include <memnotify/definitions.hpp>
 #include <memnotify/watcher.hpp>
 
@@ -125,6 +127,7 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
     uint        mySignalCounter;  /* how many objects called connect() for this one as a source */
     bool        myEnabled;        /* are we enabled or disabled? Just for fast checks           */
     QThread*    myPoller;         /* the thread to call poll if we are not using the main loop, it is alive from poll till disable call */
+    QMutex      myMutex;          /* for handling process, enable, disable correct and prevent crashes */
 
 }; /* Class MemoryNotification */
 
@@ -134,7 +137,7 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
  * ========================================================================= */
 
 inline MemoryNotification :: MemoryNotification()
-: myObservers(), myWatchers(), mySignalCounter(0), myEnabled(false), myPoller(NULL)
+: myObservers(), myWatchers(), mySignalCounter(0), myEnabled(false), myPoller(NULL), myMutex()
 {}
 
 inline MemoryNotification :: ~MemoryNotification()
@@ -176,6 +179,7 @@ inline bool MemoryNotification :: addObserver(OBSERVER observer)
   if (myObservers.count() > 0 && myObservers.indexOf(observer) >= 0)
     return false;
 
+  QMutexLocker locker(&myMutex);
   myObservers.append(observer);
   return true;
 } /* addObserver */
@@ -188,6 +192,7 @@ inline bool MemoryNotification :: delObserver(OBSERVER observer)
   if (myObservers.isEmpty())
     return false;
 
+  QMutexLocker locker(&myMutex);
   return myObservers.removeOne(observer);
 } /* delObserver */
 
