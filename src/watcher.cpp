@@ -163,6 +163,52 @@ Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theK
   return Size(val);
 } /* memoryOption */
 
+
+bool Watcher :: enable()
+{
+  if (mySensorPath.isEmpty() || mySensor)
+    return true;
+
+  myEventsCounter = 0;
+  mySensor = new CachedFile(mySensorPath.toAscii().constData());
+  return updateState();
+} /* enable */
+
+bool Watcher :: disable()
+{
+  if (mySensor)
+  {
+    delete mySensor;
+    mySensor = NULL;
+  }
+
+  return true;
+} /* disable */
+
+bool Watcher :: valid() const
+{
+  char tmp[PATH_MAX];
+
+  return ( myMemoryFree && myMemoryUsed && myMemoryLimit &&
+          Platform::defaultObject().path(mySensorPath.toAscii().constData(), tmp, sizeof(tmp)) );
+}
+
+bool Watcher :: updateState()
+{
+  if (mySensor && mySensor->load())
+  {
+    const Size memoryMeter = (const Size)mySensor->value();
+
+    /* Check that data from sensor is parsed correct */
+    if (memoryMeter > 0)
+    {
+      myState = (memoryMeter > myMemoryUsed);
+      return true;
+    }
+  }
+  return false;
+} /* updateState */
+
 void Watcher :: dump() const
 {
 #if MEMNOTIFY_DUMP

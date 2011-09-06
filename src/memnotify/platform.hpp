@@ -184,28 +184,6 @@ inline Platform::Size Platform::SystemMemory :: used()
 * Inline methods for Platform
 * ========================================================================= */
 
-inline Platform :: Platform()
-: myMemory(), mySyspart(NULL), myOptions()
-{
-  parseOptions();
-
-  /* Now check the mount point for cgroups */
-  if ( !setupCgroups(option("cgroups_mount_point").toAscii().constData()) )
-  {
-    setupCgroups(MEMNOTIFY_CGROUPS_MOUNT_POINT);
-  }
-}
-
-inline Platform :: ~Platform()
-{
-  if ( mySyspart )
-    free(mySyspart);
-
-  /* We should handle delete &Platform::defaultObject(); */
-  if (ourPlatform == this)
-    ourPlatform = NULL;
-}
-
 inline Platform::SystemMemory& Platform :: memory()
 {
   return myMemory;

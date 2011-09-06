@@ -1,3 +1,12 @@
+libmemnotifyqt (1.0.0) unstable; urgency=low
+
+  * Update version to 1.0.0 due to ABI freeze, new SONAME.
+  * Fixes: NB#277451 - Rare artificial crash in case simultaneous poll() and
+    disable() calls. Test case created by Kimmo Kinnunen.
+  * Uninline inlined code in public headers.
+
+ -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Mon, 31 August 2011 14:35:47 +0300
+
 libmemnotifyqt (0.1.6) unstable; urgency=low
 
   * Change MemoryNotification::disable() order to remove problems with closing

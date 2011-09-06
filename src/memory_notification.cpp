@@ -45,6 +45,121 @@ BEGIN_MEMNOTIFY_NAMESPACE
 
 MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
 
+
+MemoryNotification :: MemoryNotification()
+: myObservers(), myWatchers(), mySignalCounter(0), myEnabled(false), myPoller(NULL), myMutex()
+{}
+
+MemoryNotification :: ~MemoryNotification()
+{
+  if ( myEnabled )
+    disable();
+
+  QMutexLocker locker(&myMutex);
+
+  /* Clean up watchers with memory removal */
+  clearWatchers();
+
+  /* Clean up observers */
+  myObservers.clear();
+
+  if (ourMemoryNotification == this)
+    ourMemoryNotification = NULL;
+} /* ~MemoryNotification */
+
+Watcher* MemoryNotification :: watcher(const char* name) const
+{
+  if (name && *name)
+  {
+    const QString scanner(name);
+    foreach(Watcher* watcher, myWatchers)
+    {
+      Q_ASSERT(watcher != NULL);
+      if (scanner == watcher->name())
+        return watcher;
+    }
+  }
+
+  return NULL;
+} /* watcher */
+
+bool MemoryNotification :: addObserver(OBSERVER observer)
+{
+  if ( !observer )
+    return false;
+
+  QMutexLocker locker(&myMutex);
+
+  if (myObservers.count() > 0 && myObservers.indexOf(observer) >= 0)
+    return false;
+  myObservers.append(observer);
+
+  return true;
+} /* addObserver */
+
+bool MemoryNotification :: delObserver(OBSERVER observer)
+{
+  if ( !observer )
+    return false;
+
+  QMutexLocker locker(&myMutex);
+  return (!myObservers.isEmpty() && myObservers.removeOne(observer));
+} /* delObserver */
+
+uint MemoryNotification :: eventsCounter() const
+{
+  uint counter = 0;
+  foreach (const Watcher* watcher, myWatchers)
+  {
+    Q_ASSERT(watcher != NULL);
+    counter += watcher->eventsCounter();
+  }
+  return counter;
+} /* eventsCounter */
+
+void MemoryNotification :: connectNotify(const char* signal)
+{
+  QMutexLocker locker(&myMutex);
+  mySignalCounter++;
+  QObject::connectNotify(signal);
+}
+
+void MemoryNotification :: disconnectNotify(const char* signal)
+{
+  QMutexLocker locker(&myMutex);
+  if (mySignalCounter > 0)
+    mySignalCounter--;
+  QObject::disconnectNotify(signal);
+}
+
+MemoryNotification* MemoryNotification :: create(const char* pathSpecification)
+{
+  MemoryNotification* instance = new MemoryNotification();
+
+  if ( instance )
+  {
+    if ( instance->setup(pathSpecification) )
+      return instance;
+    delete instance;
+  }
+
+  /* Here we have a problems */
+  return NULL;
+} /* create */
+
+MemoryNotification& MemoryNotification :: defaultObject(const char* pathSpecification)
+{
+  if ( !ourMemoryNotification )
+  {
+    ourMemoryNotification = new MemoryNotification();
+    Q_ASSERT(ourMemoryNotification != NULL);
+    if (ourMemoryNotification)
+      ourMemoryNotification->setup(pathSpecification);
+  }
+
+  return (*ourMemoryNotification);
+} /* defaultObject */
+
 bool MemoryNotification :: setup(const char* pathSpecification)
 {
   /* We should disable functionality if it is enabled */
@@ -121,8 +236,9 @@ bool MemoryNotification :: poll()
   }
 
   /* collect the handlers */
-  int  handlers[ myWatchers.count() ];
-  const uint counter = query(handlers, myWatchers.count());
+  const uint capacity = myWatchers.count();
+  int  handlers[ capacity ];
+  const uint counter = query(handlers, capacity);
 
   if ( !counter )
     return false;

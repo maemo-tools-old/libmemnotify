@@ -88,36 +88,6 @@ class MEMNOTIFY_EXPORT CachedFile
  * Inline methods for CachedFile.
  * ========================================================================= */
 
-/* load or reload file contents, returns true of success */
-inline bool CachedFile :: load()
-{
-  /* Should we load always or check update interval? */
-  if (myUpdate)
-  {
-    struct timeval now;
-
-    if ( gettimeofday(&now, NULL) )
-    {
-      /* failed to load time - read to memory */
-      return readToMemory();
-    }
-
-    if (!myActual.tv_sec || uint((now.tv_sec - myActual.tv_sec) * 1000000 + now.tv_usec - myActual.tv_usec) >= myUpdate)
-    {
-      if ( !readToMemory() )
-        return false;
-      myActual = now;
-    }
-
-    /* file is still actual */
-    return true;
-  }
-  else
-  {
-    return readToMemory();
-  }
-} /* load */
-
 /* validate file status and contents */
 inline bool CachedFile :: valid() const
 {

@@ -152,27 +152,6 @@ inline Watcher::Size Watcher :: memoryLimit() const
   return myMemoryLimit;
 }
 
-inline bool Watcher :: enable()
-{
-  if (mySensorPath.isEmpty() || mySensor)
-    return true;
-
-  myEventsCounter = 0;
-  mySensor = new CachedFile(mySensorPath.toAscii().constData());
-  return updateState();
-}
-
-inline bool Watcher :: disable()
-{
-  if (mySensor)
-  {
-    delete mySensor;
-    mySensor = NULL;
-  }
-
-  return true;
-}
-
 inline bool Watcher :: enabled() const
 {
   return (myHandler >= 0 && mySensor);
@@ -195,14 +174,6 @@ inline uint Watcher :: eventsCounter() const
   return myEventsCounter;
 }
 
-inline bool Watcher :: valid() const
-{
-  char tmp[PATH_MAX];
-
-  return ( myMemoryFree && myMemoryUsed && myMemoryLimit &&
-          Platform::defaultObject().path(mySensorPath.toAscii().constData(), tmp, sizeof(tmp)) );
-}
-
 inline QString Watcher :: option(const QSettings& theData, const char* theKey, const QVariant& theDefVal) const
 {
   return theData.value(myName + "/" + QString(theKey), theDefVal).toString();
@@ -213,22 +184,6 @@ inline bool Watcher :: percents(Size memoryOptionValue)
 {
   return (memoryOptionValue > 0 && memoryOptionValue <= 100);
 }
-
-inline bool Watcher :: updateState()
-{
-  if (mySensor && mySensor->load())
-  {
-    const Size memoryMeter = (const Size)mySensor->value();
-
-    /* Check that data from sensor is parsed correct */
-    if (memoryMeter > 0)
-    {
-      myState = (memoryMeter > myMemoryUsed);
-      return true;
-    }
-  }
-  return false;
-} /* updateState */
 
 END_MEMOTIFY_NAMESPACE
 QT_END_HEADER

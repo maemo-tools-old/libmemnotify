@@ -95,7 +95,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 #endif
 
 #ifndef MEMNOTIFY_VERSION
-#define MEMNOTIFY_VERSION   "0.0.0"
+#define MEMNOTIFY_VERSION   "1.0.0"
 #endif
 
 /*!

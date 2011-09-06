@@ -64,6 +64,28 @@ Platform* Platform :: ourPlatform = NULL;
 const QString Platform :: ourNull;
 
 
+Platform :: Platform()
+: myMemory(), mySyspart(NULL), myOptions()
+{
+  parseOptions();
+
+  /* Now check the mount point for cgroups */
+  if ( !setupCgroups(option("cgroups_mount_point").toAscii().constData()) )
+  {
+    setupCgroups(MEMNOTIFY_CGROUPS_MOUNT_POINT);
+  }
+}
+
+Platform :: ~Platform()
+{
+  if ( mySyspart )
+    free(mySyspart);
+
+  /* We should handle delete &Platform::defaultObject(); */
+  if (ourPlatform == this)
+    ourPlatform = NULL;
+}
+
 bool Platform :: parseOptions()
 {
   const char* env = getenv(MEMNOTIFY_ENV_NAME);
