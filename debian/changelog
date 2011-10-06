@@ -1,3 +1,9 @@
+libmemnotifyqt1 (1.0.1) unstable; urgency=low
+
+  * Source package rename required for integration - Fixes: NB#277451
+
+ -- Tommi Rantala <ext-tommi.1.rantala@nokia.com>  Wed, 05 Oct 2011 12:49:58 +0300
+
 libmemnotifyqt (1.0.0) unstable; urgency=low
 
   * Update version to 1.0.0 due to ABI freeze, new SONAME.

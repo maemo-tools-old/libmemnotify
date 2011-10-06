@@ -1,4 +1,4 @@
-Source: libmemnotifyqt
+Source: libmemnotifyqt1
 Section: libs
 Priority: optional
 Maintainer: Leonid Moiseichuk <leonid.moiseichuk@nokia.com>
@@ -13,11 +13,13 @@ Description: Memory Notification library Qt-style.
  The libmemnotifyqt implements a notification for memory usage events
  according to levels specified in control file.
 
-Package: libmemnotifyqt-dev
+Package: libmemnotifyqt1-dev
 Section: libdevel
 Architecture: any
 Depends: libmemnotifyqt1 (= ${binary:Version}), libqt4-dev (>= 4.5), ${misc:Depends}
-Recommends: libmemnotifyqt-doc
+Recommends: libmemnotifyqt1-doc
+Replaces: libmemnotifyqt-dev
+Conflicts: libmemnotifyqt-dev
 Description: Memory Notification library Qt-style.
  Development package for Memory Notification.
 
@@ -26,28 +28,34 @@ Section: libdevel
 Priority: extra
 Architecture: any
 Depends: libmemnotifyqt1 (= ${binary:Version}), ${misc:Depends}
+Conflicts: libmemnotifyqt0-dbg
 Description: Memory Notification library Qt-style. Debugging package.
  Debug package for Memory Notification.
 
-Package: libmemnotifyqt-doc
+Package: libmemnotifyqt1-doc
 Section: doc
 Architecture: any
-Recommends: libmemnotifyqt-dev (= ${binary:Version}), ${misc:Depends}
+Recommends: libmemnotifyqt1-dev (= ${binary:Version}), ${misc:Depends}
+Replaces: libmemnotifyqt-doc
+Conflicts: libmemnotifyqt-doc
 Description: Memory Notification library Qt-style. Documentation for developers.
  Documenation for Memory Notification.
 
-Package: libmemnotifyqt-test
+Package: libmemnotifyqt1-test
 Section: libdevel
 Priority: extra
 Architecture: any
 Depends: libmemnotifyqt1 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libmemnotifyqt-test
 Description: Memory Notification library Qt-style. Testing files.
  Tests for Memory Notification.
 
-Package: memnotify-settings-default
+Package: memnotify1-settings-default
 Section: libs
 Priority: extra
 Architecture: any
-Provides: memnotify-settings
+Provides: memnotify-settings, memnotify-settings-default
+Replaces: memnotify-settings-default
+Conflicts: memnotify-settings-default
 Description: Memory Notification library Qt-style. Default settings.
  Default policy settings for memnotify.
