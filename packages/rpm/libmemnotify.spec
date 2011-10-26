@@ -40,6 +40,11 @@ Group: Development/Tools
 %{_libdir}/%{_name}.so.*
 %doc README COPYING
 
+%post -n %{_name} -p /sbin/ldconfig
+
+%postun -n %{_name} -p /sbin/ldconfig
+
+
 #
 # Development package
 #
