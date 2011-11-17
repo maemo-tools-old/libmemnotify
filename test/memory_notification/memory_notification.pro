@@ -24,7 +24,7 @@ QT -= gui
 
 target.path = /usr/lib/libmemnotifyqt/tests
 
-extra.files = debug.mn cgroup.nm sensor.txt
+extra.files = debug.mn cgroup.mn sensor.txt
 extra.path = /usr/lib/libmemnotifyqt/tests
 
 INSTALLS += target extra
