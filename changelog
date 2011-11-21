@@ -1,0 +1,35 @@
+
+libmemnotifyqt1 (1.0.1), 05 Oct 2011:
+  * Source package rename required for integration - 
+
+libmemnotifyqt (1.0.0), 31 August 2011:
+  * Update version to 1.0.0 due to ABI freeze, new SONAME.
+  *  - Rare artificial crash in case simultaneous poll() and
+    disable() calls. Test case created by Kimmo Kinnunen.
+  * Uninline inlined code in public headers.
+
+libmemnotifyqt (0.1.6), 06 May 2011:
+  * Change MemoryNotification::disable() order to remove problems with closing
+    thread to improve bug 250424.
+  * Increase system-wide memory limit to 90% due to now we have compressed
+    swap and memory stabilized on different level. 
+
+libmemnotifyqt (0.1.5), 15 Apr 2011:
+  * Fix strange issue with unsafe delete reported by valgrind.
+
+libmemnotifyqt (0.1.4), 06 Apr 2011:
+  * Fix issue with handling string data reported by Valgrind. 
+  * Reduce default limit to 85% due to 90% seems too high for current leaking
+    system and produce visible UI slowdown.
+
+libmemnotifyqt (0.1.3), 13 Sep 2010:
+  * Fix issue with permissions to file access. 
+
+libmemnotifyqt (0.1.2), 04 Aug 2010:
+  * Fix build with HardFP toolchain (GCC 4.4). 
+
+libmemnotifyqt (0.1.1), 09 Jul 2010:
+  * Package default policy. 
+
+libmemnotifyqt (0.1.0), 19 Mar 2010:
+  * Initial release
