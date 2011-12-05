@@ -81,12 +81,12 @@ bool WatcherBuilder :: announce(_BUILDER_INFO* info)
 void WatcherBuilder :: dump()
 {
 #if MEMNOTIFY_DUMP
-  printf ("WatcherBuilder %08x {\n", (uint)ourBuilders);
+  printf ("WatcherBuilder %p {\n", ourBuilders);
 
   for (const _BUILDER_INFO* cursor = ourBuilders; cursor; cursor = cursor->mySucc)
   {
-    printf ("   _BUILDER_INFO %08x: type '%s' func %08x succ %08x\n",
-          (uint)cursor, cursor->myType, (unsigned)(cursor->myFunc), (unsigned)(cursor->mySucc)
+    printf ("   _BUILDER_INFO %p: type '%s' func %p succ %p\n",
+          cursor, cursor->myType, cursor->myFunc, cursor->mySucc
       );
   }
 

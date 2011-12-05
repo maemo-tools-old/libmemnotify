@@ -136,8 +136,8 @@ bool CachedFile :: readToMemory()
 void CachedFile :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("CachedFile %08x: path '%s' hander %d actual %ld.%06lu update %u text '%s'\n",
-          (uint)this, myPath, myHandler, myActual.tv_sec, myActual.tv_usec, myUpdate, myText
+  printf ("CachedFile %p: path '%s' hander %d actual %ld.%06lu update %u text '%s'\n",
+          this, myPath, myHandler, myActual.tv_sec, myActual.tv_usec, myUpdate, myText
     );
 #endif /* if MEMNOTIFY_DUMP */
 }

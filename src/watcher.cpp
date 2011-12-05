@@ -202,7 +202,7 @@ bool Watcher :: updateState()
     /* Check that data from sensor is parsed correct */
     if (memoryMeter > 0)
     {
-      myState = (memoryMeter > myMemoryUsed);
+      myState = (myMemoryUsed < memoryMeter);
       return true;
     }
   }
@@ -212,9 +212,9 @@ bool Watcher :: updateState()
 void Watcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-    printf ("Watcher %08x: name '%s' type '%s' sensor %08x '%s' free %lu used %lu total limit %lu handler %d state %d events %u   ",
-            (uint)this, myName.toAscii().constData(), myType.toAscii().constData(),
-            (uint)mySensor, mySensorPath.toAscii().constData(),
+    printf ("Watcher %p: name '%s' type '%s' sensor %p '%s' free %lu used %lu total limit %lu handler %d state %d events %u   ",
+            this, myName.toAscii().constData(), myType.toAscii().constData(),
+            mySensor, mySensorPath.toAscii().constData(),
             myMemoryFree, myMemoryUsed, myMemoryLimit, myHandler, myState, myEventsCounter
     );
     if ( mySensor )

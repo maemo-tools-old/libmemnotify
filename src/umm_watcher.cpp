@@ -1,9 +1,9 @@
 /* ========================================================================= *
- * File: debug_watcher.cpp
+ * File: umm_watcher.cpp
  *
  * This file is part of Memory Notification Library (libmemnotifyqt)
  *
- * Copyright (C) 2010 Nokia Corporation. All rights reserved.
+ * Copyright (C) 2011 Nokia Corporation. All rights reserved.
  *
  * Contacts: Leonid Moiseichuk <leonid.moiseichuk@nokia.com>
  *
@@ -27,7 +27,6 @@
 * ========================================================================= */
 
 #include <sys/types.h>
-#include <sys/inotify.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,15 +37,15 @@
 BEGIN_MEMNOTIFY_NAMESPACE
 
 /* ========================================================================= *
- * Class DebugWatcher: class declaration.
+ * Class UmmWatcher: class declaration.
  * ========================================================================= */
 
-class MEMNOTIFY_PRIVATE DebugWatcher: public Watcher
+class MEMNOTIFY_PRIVATE UmmWatcher: public Watcher
 {
   public:
 
-    DebugWatcher(const QSettings& theData, const QString& theName);
-    virtual ~DebugWatcher();
+    UmmWatcher(const QSettings& theData, const QString& theName);
+    virtual ~UmmWatcher();
 
     /* change the watcher activity and change watching to enabled, disabled */
     virtual bool enable();
@@ -61,134 +60,109 @@ class MEMNOTIFY_PRIVATE DebugWatcher: public Watcher
     /* dumping internal information to stdout */
     virtual void dump() const;
 
-  private:
+  protected:
 
-    int myWatcher;
+    virtual bool updateState();
 
-}; /* DebugWatcher */
+}; /* UmmWatcher */
 
 /* ========================================================================= *
-* Class DebugWatcher: class implementation.
+* Class UmmWatcher: class implementation.
 * ========================================================================= */
 
-DebugWatcher :: DebugWatcher(const QSettings& theData, const QString& theName)
-  : Watcher(theData, theName), myWatcher(-1)
+UmmWatcher :: UmmWatcher(const QSettings& theData, const QString& theName)
+  : Watcher(theData, theName)
 {}
 
-DebugWatcher :: ~DebugWatcher()
+UmmWatcher :: ~UmmWatcher()
 {
   if ( enabled() )
     disable();
 }
 
 /* change the watcher activity and change watching to enabled, disabled */
-bool DebugWatcher :: enable()
+bool UmmWatcher :: enable()
 {
   if (valid() && Watcher::enable())
   {
-    const int ifd = inotify_init();
-
-    if (ifd >= 0)
+    myHandler = open(mySensor->path(), O_WRONLY);
+    if (myHandler > 0)
     {
-      const int wfd = inotify_add_watch(ifd, mySensor->path(), IN_ALL_EVENTS);
-      if (wfd >= 0)
-      {
-        /* seems watch was opened correct */
-        myHandler = ifd;
-        myWatcher = wfd;
-        return true;
-      }
-      else
-      {
-        close(ifd);
-      }
+      char buf[32];
+      const ssize_t len = snprintf(buf, sizeof(buf), "%lu", ulong(memoryUsed() / getpagesize()));
+      return (len > 0 && len == write(myHandler, buf, len));
     }
   }
 
   return false;
 } /* enable */
 
-bool DebugWatcher :: disable()
+bool UmmWatcher :: disable()
 {
-  if (myHandler >= 0)
+  if (myHandler > 0)
   {
     close(myHandler);
     myHandler = -1;
-    myWatcher = -1;
   }
-
   return Watcher::disable();
 } /* disable */
 
+
 /* handle an external event when it is necessary, return true if event handled properly */
-bool DebugWatcher :: process()
+bool UmmWatcher :: process()
 {
   /* Should we do something? */
-  if ( !enabled() )
-    return false;
-
-  /* prepare data for handling */
-  char buf[BUFSIZ];
-  ssize_t loaded = read(myHandler, buf, sizeof(buf));
-  const unsigned char* cursor = (const unsigned char*)buf;
-  uint handled = 0;
-
-  while (loaded >= (ssize_t) sizeof(struct inotify_event))
+  if (enabled() && updateState())
   {
-    const struct inotify_event* ep = (const struct inotify_event*)cursor;
-    const ssize_t es = sizeof(*ep) + ep->len;
-
-    if ( es >= loaded )
-    {
-#if MEMNOTIFY_DUMP
-      const char* name = (ep->len ? ep->name : "");
-      printf ("=> %s: watcher %p inotify handler %d {wd %d mask %u cookie %u name '%s'}\n",
-              __PRETTY_FUNCTION__, this, myHandler, ep->wd, ep->mask, ep->cookie, name
-          );
-#endif
-      cursor += es;
-      loaded -= es;
-      handled ++;
-    }
-    else
-      break;
-  } /* while */
-
-  /* Increase number of handled events if we have something to process */
-  if (handled > 0)
-  {
-    /* Now if we had events - need to re-load sensor file */
-    myEventsCounter += handled;
-    return updateState();
+    myEventsCounter++;
+    return true;
   }
-  else
-  {
-    return false;
-  }
+
+  return true;
 } /* process */
 
 /* validate file status and contents */
-bool DebugWatcher :: valid() const
+bool UmmWatcher :: valid() const
 {
-  return (Watcher::valid() && (mySensor ? mySensor->valid() && myWatcher >= 0 : myHandler < 0 && myWatcher < 0));
+  return (Watcher::valid() && (mySensor ? mySensor->valid() : myHandler < 0));
 } /* valid */
 
-void DebugWatcher :: dump() const
+
+bool UmmWatcher :: updateState()
+{
+  if (mySensor && mySensor->load())
+  {
+    const Size memoryMeter = (const Size)mySensor->value();
+
+    /* Check that data from sensor is parsed correct */
+    if (memoryMeter > 0)
+    {
+      myState = (myMemoryUsed / getpagesize() < memoryMeter);
+      return true;
+    }
+  }
+  return false;
+} /* updateState */
+
+
+
+void UmmWatcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("DebugWatcher %p { ", this);
+  printf ("UmmWatcher %p { ", this);
   Watcher::dump();
-  printf ("watcher %d\n}\n", myWatcher);
+  printf ("}\n");
 #endif /* if MEMNOTIFY_DUMP */
 } /* dump */
 
 
 /* ========================================================================= *
- * The DebugWatcher registration as "debug".
+ * The UmmWatcher registration as "debug".
  * ========================================================================= */
 
-ANNOUNCE_WATCHER(DebugWatcher, debug);
+ANNOUNCE_WATCHER(UmmWatcher, umm);
+ANNOUNCE_WATCHER(UmmWatcher, used_memory_meter);
 
 END_MEMOTIFY_NAMESPACE
 
-/* ==================[ end of file memnotify/debug_watcher.cpp ]====================== */
+/* ==================[ end of file memnotify/umm_watcher.cpp ]====================== */

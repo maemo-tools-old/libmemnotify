@@ -1,6 +1,16 @@
-[System Memory Low]
+[memcg: System Memory Low]
 type=cgroups
 control=/syspart/cgroup.event_control
 limit=/syspart/memory.memsw.limit_in_bytes
 sensor=/syspart/memory.memsw.usage_in_bytes
 used=90%
+
+[umm: System Memory Low]
+type=used_memory_meter
+sensor=/dev/used_memory
+used=75%
+
+[umm: System Memory Pressure]
+type=used_memory_meter
+sensor=/dev/used_memory
+used=65%

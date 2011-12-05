@@ -10,6 +10,7 @@ SOURCES += $$SRC/cached_file.cpp
 SOURCES += $$SRC/platform.cpp
 SOURCES += $$SRC/cgroups_watcher.cpp
 SOURCES += $$SRC/debug_watcher.cpp
+SOURCES += $$SRC/umm_watcher.cpp
 SOURCES += $$SRC/memory_notification.cpp
 SOURCES += $$SRC/poller.cpp
 SOURCES += $$SRC/watcher_builder.cpp

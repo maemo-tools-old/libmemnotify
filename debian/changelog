@@ -1,3 +1,10 @@
+libmemnotifyqt1 (1.1.0) unstable; urgency=low
+
+  * Added Used Memory Meter (UMM) signal source.
+  * Fixing potential problems shown by gcc 4.6
+
+ -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Mon, 05 Dec 2011 12:49:58 +0300
+
 libmemnotifyqt1 (1.0.1) unstable; urgency=low
 
   * Source package rename required for integration - Fixes: NB#277451

@@ -339,6 +339,8 @@ bool MemoryNotification :: process(const int* fds, uint counter)
   return result;
 } /* process */
 
+#define TTT()	printf ("*** pass %u\n", __LINE__)
+
 bool MemoryNotification :: enable()
 {
   QMutexLocker locker(&myMutex);
@@ -447,9 +449,9 @@ void MemoryNotification :: clearWatchers()
 void MemoryNotification :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("MemoryNotification %08x {\n", (uint)this);
-  printf ("  ourMemoryNotification %08x signal counter %u enabled %d polling thread %08x\n",
-          (uint)ourMemoryNotification, mySignalCounter, myEnabled, (uint)myPoller
+  printf ("MemoryNotification %p {\n", this);
+  printf ("  ourMemoryNotification %p signal counter %u enabled %d polling thread %p\n",
+          ourMemoryNotification, mySignalCounter, myEnabled, myPoller
       );
 
   if ( myPoller )
@@ -458,14 +460,14 @@ void MemoryNotification :: dump() const
   printf ("  observers %d {\n", myObservers.count());
   foreach (OBSERVER observer, myObservers)
   {
-    printf ("\t%08x\n", (uint)observer);
+    printf ("\t%p\n", observer);
   }
   printf ("  }\n");
 
   printf ("  watchers %d {\n", myWatchers.count());
   foreach (const Watcher* watcher, myWatchers)
   {
-    printf ("\t%08x ", (uint)watcher);
+    printf ("\t%p ", watcher);
     if (watcher)
       watcher->dump();
     else

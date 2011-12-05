@@ -62,14 +62,14 @@ TestApp::TestApp(int argc, char* argv[])
   printf ("* %s %u *\n", __PRETTY_FUNCTION__, __LINE__);
   if ( !myNotification.addObserver(listenerObserver1) )
   {
-    printf ("addObserver(%08x) failed\n", (uint)listenerObserver1);
+    printf ("addObserver(%p) failed\n", listenerObserver1);
     ::exit(1);
   }
 
   printf ("* %s %u *\n", __PRETTY_FUNCTION__, __LINE__);
   if ( !myNotification.addObserver(listenerObserver2) )
   {
-    printf ("addObserver(%08x) failed\n", (uint)listenerObserver2);
+    printf ("addObserver(%p) failed\n", listenerObserver2);
     ::exit(1);
   }
 
@@ -80,6 +80,7 @@ TestApp::TestApp(int argc, char* argv[])
   if ( !myNotification.valid() )
   {
     printf ("MemoryNotification is not valid\n");
+    myNotification.dump();
     ::exit(1);
   }
 

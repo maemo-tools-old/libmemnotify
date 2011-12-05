@@ -114,7 +114,7 @@ class MEMNOTIFY_EXPORT Watcher
     QString option(const QSettings& theData, const char* theKey, const QVariant& theDefVal = QVariant()) const;
     Size    memoryOption(const QSettings& theData, const char* theKey) const;
     bool    percents(Size memoryOptionValue);
-    bool    updateState();
+    virtual bool updateState();
 
 }; /* Class Watcher */
 

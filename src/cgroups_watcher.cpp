@@ -155,8 +155,8 @@ bool CgroupsWatcher :: process()
   while (loaded >= (ssize_t) sizeof(*cursor))
   {
 #if MEMNOTIFY_DUMP
-    printf ("=> %s: watcher %08x eventfd handler %d evendfd %016llx\n",
-            __PRETTY_FUNCTION__, (uint)this, myHandler, *cursor
+    printf ("=> %s: watcher %p eventfd handler %d evendfd %016llx\n",
+            __PRETTY_FUNCTION__, this, myHandler, *cursor
         );
 #endif
     loaded -= sizeof(*cursor);
@@ -194,7 +194,7 @@ bool CgroupsWatcher :: valid() const
 void CgroupsWatcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("CgroupsWatcher %08x { ", (uint)this);
+  printf ("CgroupsWatcher %p { ", this);
   Watcher::dump();
   printf ("control '%s'\n}\n", myControlPath.toAscii().constData());
 #endif /* if MEMNOTIFY_DUMP */

@@ -15,6 +15,7 @@ SOURCES += watcher.cpp
 SOURCES += watcher_builder.cpp 
 SOURCES += cgroups_watcher.cpp 
 SOURCES += debug_watcher.cpp 
+SOURCES += umm_watcher.cpp 
 SOURCES += poller.cpp 
 SOURCES += memory_notification.cpp 
 DEFINES += QT_DLL MEMNOTIFY_SHARED MEMNOTIFY_VERSION=\\\"$${VERSION}\\\"

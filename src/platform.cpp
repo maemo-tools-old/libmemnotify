@@ -45,8 +45,8 @@ BEGIN_MEMNOTIFY_NAMESPACE
 void Platform::SystemMemory :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("Platform::SystemMemory %08x { actual %u uptime %ld memory unit %u\n",
-      (uint)this, (uint)myActual, mySysinfo.uptime, mySysinfo.mem_unit
+  printf ("Platform::SystemMemory %p { actual %u uptime %ld memory unit %u\n",
+      this, (uint)myActual, mySysinfo.uptime, mySysinfo.mem_unit
     );
 
   printf ("   ram: total %lu free %lu shared %lu buffer %lu; swap: total %lu free %lu; high: total %lu free %lu\n}\n",
@@ -267,11 +267,11 @@ const char* Platform :: cgroup() const
 void Platform :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("Platform %08x { syspart '%s' cgroup '%s' ",
-          (uint)this, (mySyspart ? mySyspart : ""), cgroup()
+  printf ("Platform %p { syspart '%s' cgroup '%s' ",
+          this, (mySyspart ? mySyspart : ""), cgroup()
     );
 
-  printf ("options %08x = [", (uint)(&myOptions));
+  printf ("options %p = [", &myOptions);
   foreach (Option option, myOptions)
   {
     printf ("  %s = %s;", option.first.toAscii().constData(), option.second.toAscii().constData());
