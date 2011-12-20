@@ -61,7 +61,6 @@ Group: Development/Tools
 %{_libdir}/%{_name}.so
 %{_libdir}/pkgconfig/%{_name}.pc
 %{_includedir}/memnotify/
-%{_includedir}/memnotify/*
 %doc README COPYING
 
 #
