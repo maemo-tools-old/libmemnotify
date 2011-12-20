@@ -60,6 +60,7 @@ Group: Development/Tools
 %defattr(-, root, root, -)
 %{_libdir}/%{_name}.so
 %{_libdir}/pkgconfig/%{_name}.pc
+%{_includedir}/memnotify/
 %{_includedir}/memnotify/*
 %doc README COPYING
 
@@ -75,6 +76,7 @@ Group: Development/Tools
 
 %files -n %{_name}-doc
 %defattr(-, root, root, -)
+%{_defaultdocdir}/%{_name}-doc/
 %{_defaultdocdir}/%{_name}-doc/*.txt
 %{_libdir}/pkgconfig/%{_name}.pc
 
@@ -90,6 +92,8 @@ Group: Development/Tools
  
 %files -n %{_name}-test
 %defattr(-, root, root, -)
+%{_libdir}/%{_name}/
+%{_libdir}/%{_name}/tests/
 %{_libdir}/%{_name}/tests/cached_file
 %{_libdir}/%{_name}/tests/memory_notification
 %{_libdir}/%{_name}/tests/platform
