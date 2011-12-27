@@ -52,6 +52,7 @@ Group: Development/Tools
 %package -n %{_name}-devel
 Summary: Memory Notification library Qt-style
 Group: Development/Tools
+Requires: %{_name} = %{version}
 
 %description -n %{_name}-devel
  Development package for Memory Notification.
