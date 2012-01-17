@@ -5,12 +5,14 @@ limit=/syspart/memory.memsw.limit_in_bytes
 sensor=/syspart/memory.memsw.usage_in_bytes
 used=90%
 
-[umm: System Memory Low]
-type=used_memory_meter
-sensor=/dev/used_memory
+[memnotify: System Memory Low]
+type=memnotify
+sensor=/dev/memnotify
 used=75%
+property="used"
 
-[umm: System Memory Pressure]
-type=used_memory_meter
-sensor=/dev/used_memory
-used=65%
+[memnotify: System Memory Pressure]
+type=memnotify
+sensor=/dev/memnotify
+used=25%
+property="active"

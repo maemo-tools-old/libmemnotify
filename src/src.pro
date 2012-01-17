@@ -1,4 +1,4 @@
-VERSION = 1.0.0
+VERSION = 1.2.0
 TEMPLATE = lib
 TARGET = memnotifyqt
 INCLUDEPATH=.
@@ -15,7 +15,7 @@ SOURCES += watcher.cpp
 SOURCES += watcher_builder.cpp 
 SOURCES += cgroups_watcher.cpp 
 SOURCES += debug_watcher.cpp 
-SOURCES += umm_watcher.cpp 
+SOURCES += memnotify_watcher.cpp 
 SOURCES += poller.cpp 
 SOURCES += memory_notification.cpp 
 DEFINES += QT_DLL MEMNOTIFY_SHARED MEMNOTIFY_VERSION=\\\"$${VERSION}\\\"

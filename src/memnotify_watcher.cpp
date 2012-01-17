@@ -1,9 +1,9 @@
 /* ========================================================================= *
- * File: umm_watcher.cpp
+ * File: memnotify_watcher.cpp
  *
  * This file is part of Memory Notification Library (libmemnotifyqt)
  *
- * Copyright (C) 2011 Nokia Corporation. All rights reserved.
+ * Copyright (C) 2012 Nokia Corporation. All rights reserved.
  *
  * Contacts: Leonid Moiseichuk <leonid.moiseichuk@nokia.com>
  *
@@ -37,15 +37,15 @@
 BEGIN_MEMNOTIFY_NAMESPACE
 
 /* ========================================================================= *
- * Class UmmWatcher: class declaration.
+ * Class MemNotifyWatcher: class declaration for tracking /dev/memnotify.
  * ========================================================================= */
 
-class MEMNOTIFY_PRIVATE UmmWatcher: public Watcher
+class MEMNOTIFY_PRIVATE MemNotifyWatcher: public Watcher
 {
   public:
 
-    UmmWatcher(const QSettings& theData, const QString& theName);
-    virtual ~UmmWatcher();
+    MemNotifyWatcher(const QSettings& theData, const QString& theName);
+    virtual ~MemNotifyWatcher();
 
     /* change the watcher activity and change watching to enabled, disabled */
     virtual bool enable();
@@ -64,32 +64,36 @@ class MEMNOTIFY_PRIVATE UmmWatcher: public Watcher
 
     virtual bool updateState();
 
-}; /* UmmWatcher */
+  protected:
+
+    const QString myProperty; /* the tracked kind of memory comes from "property" option */
+
+}; /* MemNotifyWatcher */
 
 /* ========================================================================= *
-* Class UmmWatcher: class implementation.
+* Class MemNotifyWatcher: class implementation.
 * ========================================================================= */
 
-UmmWatcher :: UmmWatcher(const QSettings& theData, const QString& theName)
-  : Watcher(theData, theName)
+MemNotifyWatcher :: MemNotifyWatcher(const QSettings& theData, const QString& theName)
+  : Watcher(theData, theName), myProperty(option(theData, "property"))
 {}
 
-UmmWatcher :: ~UmmWatcher()
+MemNotifyWatcher :: ~MemNotifyWatcher()
 {
   if ( enabled() )
     disable();
 }
 
 /* change the watcher activity and change watching to enabled, disabled */
-bool UmmWatcher :: enable()
+bool MemNotifyWatcher :: enable()
 {
   if (valid() && Watcher::enable())
   {
     myHandler = open(mySensor->path(), O_WRONLY);
     if (myHandler > 0)
     {
-      char buf[32];
-      const ssize_t len = snprintf(buf, sizeof(buf), "%lu", ulong(memoryUsed() / getpagesize()));
+      char buf[256];
+      const ssize_t len = snprintf(buf, sizeof(buf), "%s %lu", myProperty.toAscii().constData(), ulong(memoryUsed() / getpagesize()));
       return (len > 0 && len == write(myHandler, buf, len));
     }
   }
@@ -97,7 +101,7 @@ bool UmmWatcher :: enable()
   return false;
 } /* enable */
 
-bool UmmWatcher :: disable()
+bool MemNotifyWatcher :: disable()
 {
   if (myHandler > 0)
   {
@@ -109,7 +113,7 @@ bool UmmWatcher :: disable()
 
 
 /* handle an external event when it is necessary, return true if event handled properly */
-bool UmmWatcher :: process()
+bool MemNotifyWatcher :: process()
 {
   /* Should we do something? */
   if (enabled() && updateState())
@@ -122,23 +126,27 @@ bool UmmWatcher :: process()
 } /* process */
 
 /* validate file status and contents */
-bool UmmWatcher :: valid() const
+bool MemNotifyWatcher :: valid() const
 {
   return (Watcher::valid() && (mySensor ? mySensor->valid() : myHandler < 0));
 } /* valid */
 
 
-bool UmmWatcher :: updateState()
+bool MemNotifyWatcher :: updateState()
 {
   if (mySensor && mySensor->load())
   {
-    const Size memoryMeter = (const Size)mySensor->value();
-
-    /* Check that data from sensor is parsed correct */
-    if (memoryMeter > 0)
+    const char* found = strstr(mySensor->text(), myProperty.toAscii().constData());
+    if ( found )
     {
-      myState = (myMemoryUsed / getpagesize() < memoryMeter);
-      return true;
+      const Size memoryMeter = (Size)strtoul(found + myProperty.length() + 1, NULL, 10);
+
+      /* Check that data from sensor is parsed correct */
+      if (memoryMeter > 0)
+      {
+        myState = (memoryMeter * getpagesize() >= myMemoryUsed);
+        return true;
+      }
     }
   }
   return false;
@@ -146,23 +154,23 @@ bool UmmWatcher :: updateState()
 
 
 
-void UmmWatcher :: dump() const
+void MemNotifyWatcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-  printf ("UmmWatcher %p { ", this);
+  printf ("MemNotifyWatcher %p { ", this);
   Watcher::dump();
+  printf ("tracking for property %s\n", myProperty.toAscii().constData());
   printf ("}\n");
 #endif /* if MEMNOTIFY_DUMP */
 } /* dump */
 
 
 /* ========================================================================= *
- * The UmmWatcher registration as "debug".
+ * The MemNotifyWatcher registration as "memnotify".
  * ========================================================================= */
 
-ANNOUNCE_WATCHER(UmmWatcher, umm);
-ANNOUNCE_WATCHER(UmmWatcher, used_memory_meter);
+ANNOUNCE_WATCHER(MemNotifyWatcher, memnotify);
 
 END_MEMOTIFY_NAMESPACE
 
-/* ==================[ end of file memnotify/umm_watcher.cpp ]====================== */
+/* ==================[ end of file memnotify/memnotify_watcher.cpp ]====================== */

@@ -1,3 +1,9 @@
+libmemnotifyqt1 (1.2.0) unstable; urgency=low
+
+  * Replaced Used Memory Meter (UMM) to MemNotify signal source to be compatible with memnotify.ko
+
+ -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Tue, 17 Jan 2012 12:49:58 +0300
+
 libmemnotifyqt1 (1.1.0) unstable; urgency=low
 
   * Added Used Memory Meter (UMM) signal source.

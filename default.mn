@@ -1,6 +1,5 @@
 [System Memory Low]
-type=cgroups_control
-control=/syspart/cgroup.event_control
-limit=/syspart/memory.memsw.limit_in_bytes
-sensor=/syspart/memory.memsw.usage_in_bytes
-used=90%
+type=memnotify
+sensor=/dev/memnotify
+used=80%
+property="used"

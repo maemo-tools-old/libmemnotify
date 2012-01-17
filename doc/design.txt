@@ -66,6 +66,7 @@ Overall control file structure is the following:
   limit=value or path to limit file
   free=value k|m|%
   used=value k|m|%
+  property="active"|"used"
 
 Details for each parameter:
   type    - now cgroups_control and debug can be used
@@ -82,6 +83,8 @@ type=cgroups_control  --- this controller will use cgroups infrastructure to che
 type=debug -- this controller will use pointed sensor file with inotify access to control memory level
   nothing additional, you can "echo currentMem > sensor" to see updates in application
 
+type=memnotify
+  property - kind of memory to be tracked using MemNotifyWatcher e.g. "active" or "used", check by "head -1 /dev/memnotify"
 
 Requirements for cgroups
 ------------------------

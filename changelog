@@ -1,3 +1,6 @@
+libmemnotifyqt1 (1.2.0), 17 Jan 2012:
+  * Updated Used Memory Meter (UMM) to MemNotify accourding to changes in kernel.
+
 libmemnotifyqt1 (1.1.0), 05 Dec 2011:
   * Added Used Memory Meter (UMM) signal source.
   * Fixing potential problems shown by gcc 4.6
