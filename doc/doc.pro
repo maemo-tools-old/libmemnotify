@@ -4,9 +4,10 @@ dox.files = html/*
 dox.path  = /usr/share/doc/libmemnotifyqt-doc/html
 dox.depends =
 
-texts.files = design.txt environment.txt
-texts.path = /usr/share/doc/libmemnotifyqt-doc
-texts.depends = 
+texts.target   = doc
+texts.files    = *.txt
+texts.path     = /usr/share/doc/libmemnotifyqt-doc
 
 QMAKE_EXTRA_TARGETS += dox
-INSTALLS += dox texts
+QMAKE_EXTRA_TARGETS += texts
+INSTALLS += texts dox

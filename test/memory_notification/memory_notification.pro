@@ -28,4 +28,4 @@ target.path = /usr/lib/libmemnotifyqt/tests
 extra.files = debug.mn cgroup.mn sensor.txt
 extra.path = /usr/lib/libmemnotifyqt/tests
 
-INSTALLS += target extra
+INSTALLS += extra target

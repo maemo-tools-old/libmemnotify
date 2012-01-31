@@ -5,6 +5,6 @@ includedir=${prefix}/include/memnotify
 
 Name: libmemnotify
 Description: Memory notification stuff
-Version: 1.0.0
+Version: 1.2.0
 Libs: -L${libdir} -lmemnotifyqt
 Cflags: -I${includedir}
