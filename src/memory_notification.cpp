@@ -44,7 +44,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 * ========================================================================= */
 
 MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
-
+static const char    MemoryNotificatonSignalName[] = "2notified(QString,bool)";
 
 MemoryNotification :: MemoryNotification()
 : myObservers(), myWatchers(), mySignalCounter(0), myEnabled(false), myPoller(NULL), myMutex()
@@ -119,16 +119,22 @@ uint MemoryNotification :: eventsCounter() const
 
 void MemoryNotification :: connectNotify(const char* signal)
 {
-  QMutexLocker locker(&myMutex);
-  mySignalCounter++;
+  if (signal && 0 == strcmp(signal, MemoryNotificatonSignalName))
+  {
+    QMutexLocker locker(&myMutex);
+    mySignalCounter++;
+  }
   QObject::connectNotify(signal);
 }
 
 void MemoryNotification :: disconnectNotify(const char* signal)
 {
-  QMutexLocker locker(&myMutex);
-  if (mySignalCounter > 0)
-    mySignalCounter--;
+  if (signal && 0 == strcmp(signal, MemoryNotificatonSignalName))
+  {
+    QMutexLocker locker(&myMutex);
+    if (mySignalCounter > 0)
+      mySignalCounter--;
+  }
   QObject::disconnectNotify(signal);
 }
 

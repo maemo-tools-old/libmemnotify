@@ -1,3 +1,8 @@
+libmemnotifyqt1 (1.2.1), 26 Mar 2012:
+  * Fix the issue with closing files on exec() call.
+  * Fix missing dependency for -devel package.
+  * Validate the signal name in MemoryNotification::connectNotify/disconnectNotify
+
 libmemnotifyqt1 (1.2.0), 17 Jan 2012:
   * Updated Used Memory Meter (UMM) to MemNotify accourding to changes in kernel.
 

@@ -1,5 +1,5 @@
 Name: libmemnotify
-Version: 1.2.0
+Version: 1.2.1
 Release: 1%{?dist}
 Summary: Memory Notification library Qt-style
 Group: Development/Tools
@@ -52,6 +52,7 @@ Group: Development/Tools
 %package -n %{_name}-devel
 Summary: Memory Notification library Qt-style
 Group: Development/Tools
+Requires: %{_name} = %{version}-%{release}
 
 %description -n %{_name}-devel
  Development package for Memory Notification.
@@ -116,6 +117,11 @@ Group: Development/Tools
 %doc README COPYING
 
 %changelog
+* Mon Mar 26 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.2.1
+  * Fix the issue with closing files on exec() call.
+  * Fix missing dependency for -devel package.
+  * Validate the signal name in MemoryNotification::connectNotify/disconnectNotify
+
 * Mon Jan 30 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.2.0
   * Making rpm-variant buildable.
   * Replaced Used Memory Meter (UMM) to MemNotify signal source to be compatible with memnotify.ko

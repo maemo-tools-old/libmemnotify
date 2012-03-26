@@ -95,7 +95,7 @@ bool CgroupsWatcher :: enable()
 
       if ( Platform::defaultObject().path(myControlPath.toAscii().constData(), cfp, sizeof(cfp)) )
       {
-        const int cfd = open(cfp, O_WRONLY);
+        const int cfd = open(cfp, O_WRONLY|O_CLOEXEC);
 
         if ( cfd >= 0 )
         {

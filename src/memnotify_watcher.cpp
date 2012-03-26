@@ -89,7 +89,7 @@ bool MemNotifyWatcher :: enable()
 {
   if (valid() && Watcher::enable())
   {
-    myHandler = open(mySensor->path(), O_WRONLY);
+    myHandler = open(mySensor->path(), O_WRONLY|O_CLOEXEC);
     if (myHandler > 0)
     {
       char buf[256];

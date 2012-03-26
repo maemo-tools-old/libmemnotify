@@ -1,5 +1,13 @@
+libmemnotifyqt1 (1.2.1) unstable; urgency=low
+
+  * Fix the issue with closing files on exec() call.
+  * Validate the signal name in MemoryNotification::connectNotify/disconnectNotify
+
+ -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Mon, 26 Mar 2012 12:49:58 +0300
+
 libmemnotifyqt1 (1.2.0) unstable; urgency=low
 
+  * Making rpm-variant buildable.
   * Replaced Used Memory Meter (UMM) to MemNotify signal source to be compatible with memnotify.ko
   * Fixes required for building the RPM package.
 
