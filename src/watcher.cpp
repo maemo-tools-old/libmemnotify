@@ -170,7 +170,8 @@ bool Watcher :: enable()
     return true;
 
   myEventsCounter = 0;
-  mySensor = new CachedFile(mySensorPath.toAscii().constData());
+  /* in case of update information we must reload it as fast as possible, max is HZ (=100) */
+  mySensor = new CachedFile(mySensorPath.toAscii().constData(), 10);
   return updateState();
 } /* enable */
 

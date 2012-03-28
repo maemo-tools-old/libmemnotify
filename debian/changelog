@@ -4,6 +4,13 @@ libmemnotifyqt1 (1.2.3) unstable; urgency=low
 
  -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Tue, 24 Apr 2012 17:49:58 +0300
 
+libmemnotifyqt1 (1.2.2) unstable; urgency=low
+
+  * Fix the problem when kernel able to produce several updates for the same threshold 
+    in short time. Usually that is happened as a result of application closing or crashing.
+
+ -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Wed, 28 Mar 2012 12:49:58 +0300
+
 libmemnotifyqt1 (1.2.1) unstable; urgency=low
 
   * Fix the issue with closing files on exec() call.

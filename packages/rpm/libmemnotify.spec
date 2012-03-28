@@ -120,6 +120,10 @@ Group: Development/Tools
 * Tue Apr 24 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.2.3
   * Minor optimization to reduce number of observers in kernel.
 
+* Wed Mar 28 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.2.2
+  * Fix the problem when kernel able to produce several updates for the same threshold 
+    in short time. Usually that is happened as a result of application closing or crashing.
+
 * Mon Mar 26 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.2.1
   * Fix the issue with closing files on exec() call.
   * Fix missing dependency for -devel package.

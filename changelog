@@ -1,6 +1,10 @@
 libmemnotifyqt1 (1.2.3), 24 Apr 2012:
   * Minor optimization to reduce number of observers in kernel.
 
+libmemnotifyqt1 (1.2.2), 28 Mar 2012:
+  * Fix the problem when kernel able to produce several updates for the same threshold 
+    in short time. Usually that is happened as a result of application closing or crashing.
+
 libmemnotifyqt1 (1.2.1), 26 Mar 2012:
   * Fix the issue with closing files on exec() call.
   * Fix missing dependency for -devel package.
