@@ -1,5 +1,5 @@
 Name: libmemnotify
-Version: 1.2.1
+Version: 1.2.3
 Release: 1%{?dist}
 Summary: Memory Notification library Qt-style
 Group: Development/Tools
@@ -117,6 +117,9 @@ Group: Development/Tools
 %doc README COPYING
 
 %changelog
+* Tue Apr 24 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.2.3
+  * Minor optimization to reduce number of observers in kernel.
+
 * Mon Mar 26 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.2.1
   * Fix the issue with closing files on exec() call.
   * Fix missing dependency for -devel package.

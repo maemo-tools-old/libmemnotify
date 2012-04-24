@@ -49,8 +49,11 @@ CachedFile :: CachedFile(const char* sPath, const uint msUpdateInteval)
   memset(&myActual, 0, sizeof(myActual));
   if ( Platform::defaultObject().path(sPath, buf, sizeof(buf)) )
   {
+    /* opening mode will be detected according to permissions, read expected */
+    const int mode = (0 == access(buf, R_OK|W_OK) ? O_RDWR : O_RDONLY) | O_CLOEXEC;
+
+    myHandler = open(buf, mode);
     myPath    = strdup(buf);
-    myHandler = open(myPath, O_RDONLY|O_CLOEXEC);
   }
 } /* CachedFile */
 

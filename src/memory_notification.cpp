@@ -44,7 +44,8 @@ BEGIN_MEMNOTIFY_NAMESPACE
 * ========================================================================= */
 
 MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
-static const char    MemoryNotificatonSignalName[] = "2notified(QString,bool)";
+/* Format of signal depends on compiler - will check for substring */
+static const char    MemoryNotificatonSignalName[] = "notified";
 
 MemoryNotification :: MemoryNotification()
 : myObservers(), myWatchers(), mySignalCounter(0), myEnabled(false), myPoller(NULL), myMutex()
@@ -119,7 +120,7 @@ uint MemoryNotification :: eventsCounter() const
 
 void MemoryNotification :: connectNotify(const char* signal)
 {
-  if (signal && 0 == strcmp(signal, MemoryNotificatonSignalName))
+  if (signal && strstr(signal, MemoryNotificatonSignalName))
   {
     QMutexLocker locker(&myMutex);
     mySignalCounter++;
@@ -129,7 +130,7 @@ void MemoryNotification :: connectNotify(const char* signal)
 
 void MemoryNotification :: disconnectNotify(const char* signal)
 {
-  if (signal && 0 == strcmp(signal, MemoryNotificatonSignalName))
+  if (signal && strstr(signal, MemoryNotificatonSignalName))
   {
     QMutexLocker locker(&myMutex);
     if (mySignalCounter > 0)
@@ -344,8 +345,6 @@ bool MemoryNotification :: process(const int* fds, uint counter)
 
   return result;
 } /* process */
-
-#define TTT()	printf ("*** pass %u\n", __LINE__)
 
 bool MemoryNotification :: enable()
 {

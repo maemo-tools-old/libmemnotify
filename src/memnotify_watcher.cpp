@@ -89,13 +89,11 @@ bool MemNotifyWatcher :: enable()
 {
   if (valid() && Watcher::enable())
   {
-    myHandler = open(mySensor->path(), O_WRONLY|O_CLOEXEC);
-    if (myHandler > 0)
-    {
-      char buf[256];
-      const ssize_t len = snprintf(buf, sizeof(buf), "%s %lu", myProperty.toAscii().constData(), ulong(memoryUsed() / getpagesize()));
-      return (len > 0 && len == write(myHandler, buf, len));
-    }
+    char buf[256];
+
+    myHandler = mySensor->handler(); /* Sensor should detect writable /dev/memnotify */
+    const ssize_t len = snprintf(buf, sizeof(buf), "%s %lu", myProperty.toAscii().constData(), ulong(memoryUsed() / getpagesize()));
+    return (len > 0 && len == write(myHandler, buf, len));
   }
 
   return false;
@@ -103,11 +101,7 @@ bool MemNotifyWatcher :: enable()
 
 bool MemNotifyWatcher :: disable()
 {
-  if (myHandler > 0)
-  {
-    close(myHandler);
-    myHandler = -1;
-  }
+  myHandler = -1;
   return Watcher::disable();
 } /* disable */
 

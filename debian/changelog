@@ -1,3 +1,9 @@
+libmemnotifyqt1 (1.2.3) unstable; urgency=low
+
+  * Minor optimization to reduce number of observers in kernel.
+
+ -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Tue, 24 Apr 2012 17:49:58 +0300
+
 libmemnotifyqt1 (1.2.1) unstable; urgency=low
 
   * Fix the issue with closing files on exec() call.
