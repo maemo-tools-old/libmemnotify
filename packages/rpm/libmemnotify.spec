@@ -1,5 +1,5 @@
 Name: libmemnotify
-Version: 1.2.3
+Version: 1.3.0
 Release: 1%{?dist}
 Summary: Memory Notification library Qt-style
 Group: Development/Tools
@@ -117,6 +117,9 @@ Group: Development/Tools
 %doc README COPYING
 
 %changelog
+* Tue May 15 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.3.0
+  * Small refactoring to remove connect/disconnect notifier hassle.
+
 * Tue Apr 24 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.2.3
   * Minor optimization to reduce number of observers in kernel.
 

@@ -111,10 +111,6 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
 
   protected:
 
-    /* Overloaded from Object to track subscription of observers */
-    virtual void connectNotify(const char* signal);
-    virtual void disconnectNotify(const char* signal);
-
     /* Remove all watchers from memory */
     void clearWatchers();
 
@@ -124,7 +120,6 @@ class MEMNOTIFY_EXPORT MemoryNotification: public QObject
     /* That is instance data */
     QList<OBSERVER> myObservers;  /* list of observers, expected to be 1 or 2 usually, 10+ means design problems            */
     QList<Watcher*> myWatchers;   /* list of watchers/thresholds, expected to be 1 or 2 usually, 10+ means design problems  */
-    uint        mySignalCounter;  /* how many objects called connect() for this one as a source */
     bool        myEnabled;        /* are we enabled or disabled? Just for fast checks           */
     QThread*    myPoller;         /* the thread to call poll if we are not using the main loop, it is alive from poll till disable call */
     QMutex      myMutex;          /* for handling process, enable, disable correct and prevent crashes */

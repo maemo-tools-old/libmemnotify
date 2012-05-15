@@ -44,11 +44,9 @@ BEGIN_MEMNOTIFY_NAMESPACE
 * ========================================================================= */
 
 MemoryNotification*  MemoryNotification :: ourMemoryNotification = NULL;
-/* Format of signal depends on compiler - will check for substring */
-static const char    MemoryNotificatonSignalName[] = "notified";
 
 MemoryNotification :: MemoryNotification()
-: myObservers(), myWatchers(), mySignalCounter(0), myEnabled(false), myPoller(NULL), myMutex()
+: myObservers(), myWatchers(), myEnabled(false), myPoller(NULL), myMutex()
 {}
 
 MemoryNotification :: ~MemoryNotification()
@@ -117,27 +115,6 @@ uint MemoryNotification :: eventsCounter() const
   }
   return counter;
 } /* eventsCounter */
-
-void MemoryNotification :: connectNotify(const char* signal)
-{
-  if (signal && strstr(signal, MemoryNotificatonSignalName))
-  {
-    QMutexLocker locker(&myMutex);
-    mySignalCounter++;
-  }
-  QObject::connectNotify(signal);
-}
-
-void MemoryNotification :: disconnectNotify(const char* signal)
-{
-  if (signal && strstr(signal, MemoryNotificatonSignalName))
-  {
-    QMutexLocker locker(&myMutex);
-    if (mySignalCounter > 0)
-      mySignalCounter--;
-  }
-  QObject::disconnectNotify(signal);
-}
 
 MemoryNotification* MemoryNotification :: create(const char* pathSpecification)
 {
@@ -339,8 +316,7 @@ bool MemoryNotification :: process(const int* fds, uint counter)
     }
 
     /* if necessary - notify subscribers */
-    if (mySignalCounter > 0)
-      emit notified(name, state);
+    emit notified(name, state);
   } /* for each updated */
 
   return result;
@@ -351,9 +327,6 @@ bool MemoryNotification :: enable()
   QMutexLocker locker(&myMutex);
 
   if ( myEnabled )
-    return false;
-
-  if (0 == mySignalCounter && myObservers.isEmpty())
     return false;
 
   if ( myWatchers.isEmpty() )
@@ -412,10 +385,6 @@ bool MemoryNotification :: disable()
 
 bool MemoryNotification :: valid() const
 {
-  /* first, we must have subscribed items */
-  if (0 == mySignalCounter && myObservers.isEmpty())
-    return false;
-
   /* we must have sources for signal generation */
   if ( myWatchers.isEmpty() )
     return false;
@@ -455,8 +424,8 @@ void MemoryNotification :: dump() const
 {
 #if MEMNOTIFY_DUMP
   printf ("MemoryNotification %p {\n", this);
-  printf ("  ourMemoryNotification %p signal counter %u enabled %d polling thread %p\n",
-          ourMemoryNotification, mySignalCounter, myEnabled, myPoller
+  printf ("  ourMemoryNotification %p enabled %d polling thread %p\n",
+          ourMemoryNotification, myEnabled, myPoller
       );
 
   if ( myPoller )

@@ -128,12 +128,6 @@ MEMNOTIFY::MemoryNotification -- Main proxy class to control subscription and pr
   valid() -- validate current object (e.g. file exists)
   dump()  -- dump the contents for debugging
 
-Todo:
-  1. to create actual observers we can track
-  protected:
-    virtual void connectNotify(const char* signal);
-    virtual void disconnectNotify(const char* signal);
-
 file poller
   Thread-based poll call if we do not plan to use query/process combination. That is expected to have less 10 thresholds
   per application and not much updates - so pol() call was used. But it could be replaced to epoll if necessary.

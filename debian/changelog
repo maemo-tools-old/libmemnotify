@@ -1,3 +1,9 @@
+libmemnotifyqt1 (1.3.0) unstable; urgency=low
+
+  * Small refactoring to remove connect/disconnect notifier hassle.
+
+ -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Tue, 15 May 2012 14:23:58 +0300
+
 libmemnotifyqt1 (1.2.3) unstable; urgency=low
 
   * Minor optimization to reduce number of observers in kernel.
