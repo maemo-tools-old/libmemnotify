@@ -1,0 +1,57 @@
+I think that is most useful document in the package, but please check doc/design.txt for extra information.
+Thanks for questions from Mark Tseytlin which are used to make this document.
+
+Q: Which minimal code is required to enable API?
+A: Levels specification (see example in default.mn file), linking of libmemnotifyqt and code which contains
+   creation, enabling, and polling of memory notification object. Polling caused thead creation:
+      MemoryNotification& mn = MemoryNotification::defaultObject();
+      QObject::connect(&mn, SIGNAL(notified(QString,bool)), this, SLOT(onNotified(QString,bool)));
+      if (mn.enable() && mn.poll())
+      {
+        return "it works"
+      }
+
+      void MyApp::onNotified(const QString& name, const bool state)
+      {
+          qDebug() << "+++MT+++SIGNAL: memory signal= " << name << " state= " << state;
+      }
+
+Q: Should I use something else instead of
+     m_myNotification = new MemoryNotification();
+     m_myNotification->setup("myapp");
+A: Mostly up to you. If you can use pseudo-constructor to replace two lines above
+     m_myNotification = new MemoryNotification::create("myapp");
+   or point object as default/global singletone
+     m_myNotification = MEMNOTIFY::MemoryNotification::defaultObject("myapp");
+
+Q: What is a parameter for setup?
+A: Specification of path of file where descriptions of memory levels located, quite simple:
+   - If file no extension -->  .mn added
+      Thus, "myapp" lead to "myapp.mn" file
+   - If no path --> /etc/memnotify added
+      Thus, "myapp" lead to "/etc/memnotify/myapp.mn" path
+    Note: check doc/environment.txt if you want to place to another location
+   - If "~" specified in the beginning it will be replaced to $HOME
+      Thus, "~/myapp" lead to "$HOME/myapp.mn" path
+   - You free to specify full location explicitely
+      e.g. "/usr/share/myapp/memnotify.mn"
+   - The ":" could be used to separate several files to load levels descriptions one by one
+      Thus, "default:myapp" hanles default.mn first and then myapp.mn
+    Note: all variations specified above are possible
+
+Q: What is happened if I have 2 levels with the same names?
+A: You will receive two notifications when you cross specified levels. But search for watcher name
+   will return only first watcher in list.
+
+Q: What for "limit" is used?
+A: Limit is a base which is used to calculate threshold, if not specified it is taken from system
+   available RAM plus swap. You can specify you own limit and level percentage will be counted according
+   to limit i.e.
+      limit=100M
+      free=25%
+   =>  Lead to set threshold at 75MB
+      limit=100M
+      used=25%
+  =>  Lead to set threshold at 25MB
+  Specification of limit is necessary when you have non-standard base e.g. cgroup (which is fraction
+  of whole memory) or graphics memory.

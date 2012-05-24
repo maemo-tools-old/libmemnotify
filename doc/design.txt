@@ -52,11 +52,11 @@ Control files structure
 The control file is an ascii ini-style file which contains levels description for specified controllers.
 Control file could be located:
 - /etc/memnotify folder as a system-wide specification, accessible as "platform.mn"
-- $HOME folder - as user-only specification, accessible as "./quake3/memory.mn"
+- $HOME folder - as user-only specification, accessible as "~/quake3/memory.mn"
 - some path which you like, e.g. "/etc/defaults/quake.mn"
 
 You can point such files in constructor path, thresholds with the same names will be updated according to files list
-  notify = new MemoryNotification("default:./quake3/memory.mn");
+  notify = new MemoryNotification("default:~/quake3/memory.mn");
 
 Overall control file structure is the following:
   [Memory Signal Name]

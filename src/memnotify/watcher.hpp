@@ -85,6 +85,9 @@ class MEMNOTIFY_EXPORT Watcher
     /* validate current status: true if level reached, false otherwise */
     bool state() const;
 
+    /* provides latest value [bytes] got from low level APIs for state tracking or 0 if not known */
+    Size meter() const;
+
     /* Statistics of processed events to crossing threshold, we may handle 2 events and return to original state */
     uint eventsCounter() const;
 
@@ -107,6 +110,7 @@ class MEMNOTIFY_EXPORT Watcher
     int         myHandler;  /* Handler which is used to track changes (e.g. inotify or eventfd) */
     CachedFile* mySensor;   /* The sensor file if necessary, this file will have actual changes */
     bool        myState;    /* Current state which reflects real theshold value - on/off        */
+    Size        myMeter;    /* Value loaded from low level as memory consumption, in bytes      */
     uint  myEventsCounter;  /* Number of processed events in process call                       */
 
   protected:
@@ -166,6 +170,11 @@ inline int Watcher :: handler() const
 inline bool Watcher :: state() const
 {
   return (enabled() && myState);
+}
+
+inline Watcher::Size Watcher :: meter() const
+{
+  return (enabled() ? myMeter : Watcher::Size(0));
 }
 
 /* Statistics of processed events to crossing threshold */

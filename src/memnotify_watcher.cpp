@@ -133,12 +133,13 @@ bool MemNotifyWatcher :: updateState()
     const char* found = strstr(mySensor->text(), myProperty.toAscii().constData());
     if ( found )
     {
-      const Size memoryMeter = (Size)strtoul(found + myProperty.length() + 1, NULL, 10);
+      const Watcher::Size memoryMeter = (const Watcher::Size)strtoul(found + myProperty.length() + 1, NULL, 10);
 
       /* Check that data from sensor is parsed correct */
       if (memoryMeter > 0)
       {
-        myState = (memoryMeter * getpagesize() >= myMemoryUsed);
+        myMeter = memoryMeter * getpagesize();
+        myState = (myMemoryUsed < myMeter);
         return true;
       }
     }

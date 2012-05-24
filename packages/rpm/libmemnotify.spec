@@ -1,5 +1,5 @@
 Name: libmemnotify
-Version: 1.3.0
+Version: 1.3.1
 Release: 1%{?dist}
 Summary: Memory Notification library Qt-style
 Group: Development/Tools
@@ -76,6 +76,7 @@ Group: Development/Tools
 
 %files -n %{_name}-doc
 %defattr(-, root, root, -)
+%{_defaultdocdir}/%{_name}-doc/FAQ.txt
 %{_defaultdocdir}/%{_name}-doc/design.txt
 %{_defaultdocdir}/%{_name}-doc/environment.txt
 %{_libdir}/pkgconfig/%{_name}.pc
@@ -117,6 +118,9 @@ Group: Development/Tools
 %doc README COPYING
 
 %changelog
+* Thu May 24 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.3.1
+  * Added support for Watcher::meter() method to return current amount of memory.
+
 * Tue May 15 2012 Leonid Moiseichuk <leonid.moiseichuk@nokia.com> 1.3.0
   * Small refactoring to remove connect/disconnect notifier hassle.
 

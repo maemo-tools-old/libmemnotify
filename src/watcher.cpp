@@ -42,7 +42,7 @@ BEGIN_MEMNOTIFY_NAMESPACE
 Watcher :: Watcher(const QSettings& theData, const QString& theName)
   : myName(theName), myType(option(theData, "type")), mySensorPath(option(theData, "sensor")),
     myMemoryFree(memoryOption(theData, "free")), myMemoryUsed(memoryOption(theData, "used")), myMemoryLimit(memoryOption(theData, "limit")),
-    myHandler(-1), mySensor(NULL), myState(false), myEventsCounter(0)
+    myHandler(-1), mySensor(NULL), myState(false), myMeter(0), myEventsCounter(0)
 {
   uint max_memory_usage = 100;
   const Platform::Size platform_total = Platform::defaultObject().memory().total();
@@ -160,7 +160,7 @@ Watcher::Size Watcher :: memoryOption(const QSettings& theData, const char* theK
     val = 0;
   }
 
-  return Size(val);
+  return Watcher::Size(val);
 } /* memoryOption */
 
 
@@ -198,12 +198,13 @@ bool Watcher :: updateState()
 {
   if (mySensor && mySensor->load())
   {
-    const Size memoryMeter = (const Size)mySensor->value();
+    const Watcher::Size memoryMeter = (const Watcher::Size)mySensor->value();
 
     /* Check that data from sensor is parsed correct */
     if (memoryMeter > 0)
     {
-      myState = (myMemoryUsed < memoryMeter);
+      myMeter = memoryMeter;
+      myState = (myMemoryUsed < myMeter);
       return true;
     }
   }
@@ -213,10 +214,10 @@ bool Watcher :: updateState()
 void Watcher :: dump() const
 {
 #if MEMNOTIFY_DUMP
-    printf ("Watcher %p: name '%s' type '%s' sensor %p '%s' free %lu used %lu total limit %lu handler %d state %d events %u   ",
+    printf ("Watcher %p: name '%s' type '%s' sensor %p '%s' free %lu used %lu total limit %lu handler %d state %d meter %lu events %u   ",
             this, myName.toAscii().constData(), myType.toAscii().constData(),
             mySensor, mySensorPath.toAscii().constData(),
-            myMemoryFree, myMemoryUsed, myMemoryLimit, myHandler, myState, myEventsCounter
+            myMemoryFree, myMemoryUsed, myMemoryLimit, myHandler, myState, myMeter, myEventsCounter
     );
     if ( mySensor )
       mySensor->dump();

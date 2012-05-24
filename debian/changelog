@@ -1,3 +1,9 @@
+libmemnotifyqt1 (1.3.1) unstable; urgency=low
+
+  * Added support for Watcher::meter() method to return current amount of memory.
+
+ -- Leonid Moiseichuk <leonid.moiseichuk@nokia.com>  Thu, 24 May 2012 14:23:58 +0300
+
 libmemnotifyqt1 (1.3.0) unstable; urgency=low
 
   * Small refactoring to remove connect/disconnect notifier hassle.

@@ -10,7 +10,7 @@ pc.files = libmemnotifyqt.pc
 pc.path = /usr/lib/pkgconfig
 INSTALLS += pc
 
-texts.files = doc/design.txt doc/environment.txt
+texts.files = doc/FAQ.txt doc/design.txt doc/environment.txt
 texts.path  = /usr/share/doc/packages/libmemnotifyqt-doc
 INSTALLS   += texts
 

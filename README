@@ -6,6 +6,7 @@ Frequently asked questions (FAQ):
 
 MemNotify is a library to manage memory usage signals, mostly from cgroups containers.
 For more detailed description and examples see the "Design Notes" in file doc/design.txt
+or doc/FAQ.txt
 
 2. What for that is?
 
