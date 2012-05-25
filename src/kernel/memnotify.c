@@ -35,11 +35,6 @@
 #include <linux/spinlock_types.h>
 #include <linux/timer.h>
 
-#ifdef CONFIG_CMA
-#include <linux/dma-contiguous.h>
-#endif
-
-
 /*
  * How often [ms] information will be updated.
  */
@@ -72,10 +67,6 @@ static const char * const memtypes[] = {
 	"used",
 	"active",
 	"total",
-#ifdef CONFIG_CMA
-	"gmem_total_free",
-	"gmem_largest_free",
-#endif
 };
 #define MN_TYPES_SIZE		(ARRAY_SIZE(memtypes))
 #define MN_LINE_BUFFER_SIZE	(MN_TYPES_SIZE * 32)
@@ -215,12 +206,6 @@ static inline bool validate_observer(
 /* Please update this function if contents memtypes is changed */
 static inline void get_memory_status(struct memvalue *value)
 {
-#ifdef CONFIG_CMA
-	struct dev_cma_info	info[MAX_CMA_AREAS];
-	int i;
-	int count;
-#endif
-
 	/* field #0 -- used memory by substracting free memories */
 	value->v[0] = available_pages;
 
@@ -245,21 +230,6 @@ static inline void get_memory_status(struct memvalue *value)
 
 	/* field #2 -- total available pages */
 	value->v[2] = available_pages;
-
-#ifdef CONFIG_CMA
-	count = get_cma_info(info, ARRAY_SIZE(info));
-	value->v[3] = 0;
-	value->v[4] = 0;
-
-	for (i = 0; i < count; i++) {
-		/* field #3 -- overall free graphical (CMA) memory */
-		value->v[3] += info[i].nr_pages - info[i].total_alloc;
-
-		/* field #4 -- maximal free graphical (CMA) memory block */
-		if (info[i].max_free_block > value->v[4])
-			value->v[4] = info[i].max_free_block;
-	}
-#endif
 }
 
 /* this method invoked from timer to re-check statistics */
